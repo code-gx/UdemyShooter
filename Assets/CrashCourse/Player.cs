@@ -6,6 +6,10 @@ using UnityEngine.SocialPlatforms;
 
 public class Player : MonoBehaviour
 {
+    [Header("Gun data")]
+    [SerializeField] private Transform gunPoint;
+    [SerializeField] private float bulletSpeed;
+    [SerializeField] private GameObject bulletPrefab;
     
     [Header("Movemenet data")]
     [SerializeField] private float moveSpeed;
@@ -41,6 +45,11 @@ public class Player : MonoBehaviour
 
     private void CheckInputs()
     {
+        if(Input.GetKeyDown(KeyCode.Mouse0))
+        {
+            Shoot();
+        }
+
         verticalInput = Input.GetAxis("Vertical");
         horizontalInput = Input.GetAxis("Horizontal");
         if(verticalInput < 0)
@@ -49,6 +58,13 @@ public class Player : MonoBehaviour
         }
     }
 
+    private void Shoot()
+    {
+        GameObject bullet = Instantiate(bulletPrefab, gunPoint.position, Quaternion.identity);
+        bullet.GetComponent<Rigidbody>().velocity = gunPoint.forward * bulletSpeed;
+
+        Destroy(bullet, 7);
+    }
     private void ApplyMovement()
     {
         Vector3 movement = transform.forward * moveSpeed * verticalInput;
