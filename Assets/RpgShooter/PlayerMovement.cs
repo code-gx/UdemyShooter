@@ -8,6 +8,7 @@ public class PlayerMovement : MonoBehaviour
 {
     private PlayerControls controls;
     private CharacterController characterController;
+    private Animator animator;
 
     [Header("Movement info")]
     private Vector3 moveDirection;
@@ -29,6 +30,7 @@ public class PlayerMovement : MonoBehaviour
     }
     private void Start() {
         characterController = GetComponent<CharacterController>();
+        animator = GetComponentInChildren<Animator>();
     }
     private void OnEnable() {
         controls.Enable();
@@ -41,8 +43,14 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         ApplyMovement();
+        AimTowardsMouse();
+        AnimaterControllers();
+    }
+
+    private void AimTowardsMouse()
+    {
         Ray ray = Camera.main.ScreenPointToRay(aimInput);
-        if(Physics.Raycast(ray, out var hitInfo, Mathf.Infinity, aimLayerMask))
+        if (Physics.Raycast(ray, out var hitInfo, Mathf.Infinity, aimLayerMask))
         {
             lookDirection = hitInfo.point - transform.position;
             lookDirection.y = 0f;
@@ -50,6 +58,15 @@ public class PlayerMovement : MonoBehaviour
             transform.forward = lookDirection;
             aim.position = new Vector3(hitInfo.point.x, transform.position.y, hitInfo.point.z);
         }
+    }
+
+    private void AnimaterControllers()
+    {
+        float xVelocity = Vector3.Dot(moveDirection.normalized, transform.right);
+        float zVelocity = Vector3.Dot(moveDirection.normalized, transform.forward);
+
+        animator.SetFloat("xVelocity", xVelocity, 0.1f, Time.deltaTime);
+        animator.SetFloat("zVelocity", zVelocity, 0.1f, Time.deltaTime);
     }
 
     private void ApplyMovement()

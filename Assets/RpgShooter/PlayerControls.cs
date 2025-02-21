@@ -53,6 +53,15 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Run"",
+                    ""type"": ""Button"",
+                    ""id"": ""6a7fb61e-172a-409e-afbb-98f14646f5c1"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -132,6 +141,17 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""action"": ""Aim"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""659e52b1-802d-42b1-a54c-92ea8ea6cddd"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Run"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -143,6 +163,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Character_Fire = m_Character.FindAction("Fire", throwIfNotFound: true);
         m_Character_Movement = m_Character.FindAction("Movement", throwIfNotFound: true);
         m_Character_Aim = m_Character.FindAction("Aim", throwIfNotFound: true);
+        m_Character_Run = m_Character.FindAction("Run", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -207,6 +228,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Character_Fire;
     private readonly InputAction m_Character_Movement;
     private readonly InputAction m_Character_Aim;
+    private readonly InputAction m_Character_Run;
     public struct CharacterActions
     {
         private @PlayerControls m_Wrapper;
@@ -214,6 +236,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         public InputAction @Fire => m_Wrapper.m_Character_Fire;
         public InputAction @Movement => m_Wrapper.m_Character_Movement;
         public InputAction @Aim => m_Wrapper.m_Character_Aim;
+        public InputAction @Run => m_Wrapper.m_Character_Run;
         public InputActionMap Get() { return m_Wrapper.m_Character; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -232,6 +255,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Aim.started += instance.OnAim;
             @Aim.performed += instance.OnAim;
             @Aim.canceled += instance.OnAim;
+            @Run.started += instance.OnRun;
+            @Run.performed += instance.OnRun;
+            @Run.canceled += instance.OnRun;
         }
 
         private void UnregisterCallbacks(ICharacterActions instance)
@@ -245,6 +271,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Aim.started -= instance.OnAim;
             @Aim.performed -= instance.OnAim;
             @Aim.canceled -= instance.OnAim;
+            @Run.started -= instance.OnRun;
+            @Run.performed -= instance.OnRun;
+            @Run.canceled -= instance.OnRun;
         }
 
         public void RemoveCallbacks(ICharacterActions instance)
@@ -267,5 +296,6 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         void OnFire(InputAction.CallbackContext context);
         void OnMovement(InputAction.CallbackContext context);
         void OnAim(InputAction.CallbackContext context);
+        void OnRun(InputAction.CallbackContext context);
     }
 }
