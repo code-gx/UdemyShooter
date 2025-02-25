@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SocialPlatforms;
 
-public class Player : MonoBehaviour
+public class PlayerTest : MonoBehaviour
 {
     [Header("Gun data")]
     [SerializeField] private Transform gunPoint;

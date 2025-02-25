@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
+    private Player player;
     private PlayerControls controls;
     private CharacterController characterController;
     private Animator animator;
@@ -22,25 +23,16 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private LayerMask aimLayerMask;
     private Vector3 lookDirection;
     private Vector2 aimInput;
-    private void Awake()
-    {
-        AssignInputEvents();
-    }
-
 
     private void Start() {
+        player = GetComponent<Player>();
         characterController = GetComponent<CharacterController>();
         animator = GetComponentInChildren<Animator>();
 
         speed = walkSpeed;
+        AssignInputEvents();
     }
-    private void OnEnable() {
-        controls.Enable();
-    }
-
-    private void OnDisable() {
-        controls.Disable();
-    }
+    
 
     private void Update()
     {
@@ -49,10 +41,6 @@ public class PlayerMovement : MonoBehaviour
         AnimaterControllers();
     }
 
-    private void Shoot()
-    {
-        animator.SetTrigger("Fire");
-    }
 
     private void AimTowardsMouse()
     {
@@ -100,9 +88,7 @@ public class PlayerMovement : MonoBehaviour
     }
     private void AssignInputEvents()
     {
-        controls = new PlayerControls();
-
-        controls.Character.Fire.performed += context => Shoot();
+        controls = player.controls;
 
         controls.Character.Movement.performed += context => moveInput = context.ReadValue<Vector2>();
         controls.Character.Movement.canceled += context => moveInput = Vector2.zero;
