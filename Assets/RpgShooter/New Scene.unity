@@ -980,8 +980,9 @@ MonoBehaviour:
   shotGun: {fileID: 1712494378}
   sniperRifle: {fileID: 27901365}
   leftHandIK: {fileID: 447668315}
-  leftHandTarget: {fileID: 0}
-  rigIncreaseSpeed: 2.75
+  leftHandTarget: {fileID: 1992841363}
+  leftHandIKIncreaseRate: 2.5
+  rigWeightIncreaseRate: 2.5
 --- !u!1 &675401089
 GameObject:
   m_ObjectHideFlags: 0

@@ -7,9 +7,11 @@ public enum Weapon_Grab_Type
     BackGrab,
 }
 
-public class WeaponVisualController : MonoBehaviour
+public class PlayerWeaponVisuals : MonoBehaviour
 {
     private Animator anim;
+    private bool busyGrabWeapon;
+    #region Gun transforms region
     [SerializeField] private Transform[] gunTransforms;
     [SerializeField] private Transform pistol;
     [SerializeField] private Transform revolver;
@@ -18,54 +20,87 @@ public class WeaponVisualController : MonoBehaviour
     [SerializeField] private Transform sniperRifle;
 
     private Transform currentGun;
+
+    #endregion
     [Header("left hand IK")]
     [SerializeField] private TwoBoneIKConstraint leftHandIK;
     [SerializeField] private Transform leftHandTarget;
+    [SerializeField] private float leftHandIKIncreaseRate;
+    private bool shouldIncreaseLeftHandIKWeight;
 
     [Header("rig")]
     private Rig rig;
-    private bool rigShouldBeIncreased;
-    [SerializeField] private float rigIncreaseSpeed;
+    [SerializeField] private float rigWeightIncreaseRate;
+    private bool shouldIncreaseRigWeight;
+
 
     private void Start()
     {
-        SwitchOn(pistol);
         anim = GetComponentInChildren<Animator>();
         rig = GetComponentInChildren<Rig>();
+        SwitchOn(pistol);
     }
 
     private void Update()
     {
         CheckWeaponSwitch();
-        if(Input.GetKeyDown(KeyCode.R))
+        if (Input.GetKeyDown(KeyCode.R))
         {
             anim.SetTrigger("Reload");
-            PauseRig();
+            ReduceRigWeight();
         }
 
-        if (rigShouldBeIncreased)
+        UpdateRigWeight();
+        UpdateLeftHandIKWeight();
+    }
+
+    private void UpdateLeftHandIKWeight()
+    {
+        if (shouldIncreaseLeftHandIKWeight)
         {
-            rig.weight += rigIncreaseSpeed * Time.deltaTime;
-            if(rig.weight >= 1)
+            leftHandIK.weight += leftHandIKIncreaseRate * Time.deltaTime;
+            if (leftHandIK.weight >= 1)
             {
-                rigShouldBeIncreased = false;
+                shouldIncreaseLeftHandIKWeight = false;
             }
         }
     }
 
-    private void PauseRig()
+    private void UpdateRigWeight()
+    {
+        if (shouldIncreaseRigWeight)
+        {
+            rig.weight += rigWeightIncreaseRate * Time.deltaTime;
+            if (rig.weight >= 1)
+            {
+                shouldIncreaseRigWeight = false;
+            }
+        }
+    }
+
+    private void ReduceRigWeight()
     {
         rig.weight = 0.15f;
     }
 
-    public void ReturnRigWeightToOne() => rigShouldBeIncreased = true;
+    public void MaximizeRigWeight() => shouldIncreaseRigWeight = true;
+    public void MaximizeLeftHandIKWeight() => shouldIncreaseLeftHandIKWeight = true;
     private void PlayWeaponGrabAnimation(Weapon_Grab_Type grabType)
     {
-        PauseRig();
+        //主要是手腕ik 影响了切枪的动作
+        ReduceRigWeight();
         leftHandIK.weight = 0;
         anim.SetBool("BusyGrabbingWeapon", true);
         anim.SetFloat("WeaponGrabType", (float)grabType);
         anim.SetTrigger("WeaponGrab");
+
+        SetGrabBusy(true);
+    }
+
+    public void SetGrabBusy(bool flag)
+    {
+        busyGrabWeapon = flag;
+        anim.SetBool("BusyGrabbingWeapon", busyGrabWeapon);
     }
     
     private void CheckWeaponSwitch()
