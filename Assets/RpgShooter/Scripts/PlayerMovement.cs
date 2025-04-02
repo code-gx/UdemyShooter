@@ -14,17 +14,15 @@ public class PlayerMovement : MonoBehaviour
     [Header("Movement info")]
     [SerializeField] private float walkSpeed;
     [SerializeField] private float runSpeed;
+    [SerializeField] private float turnSpeed;
     private float speed;
     private float verticalVelocity;
-    private Vector2 moveInput;
+    public Vector2 moveInput {get; private set;}
     private bool isRunning;
-    [Header("Aim info")]
-    [SerializeField] private Transform aim;
-    [SerializeField] private LayerMask aimLayerMask;
-    private Vector3 lookDirection;
-    private Vector2 aimInput;
 
-    private void Start() {
+
+    private void Start()
+    {
         player = GetComponent<Player>();
         characterController = GetComponent<CharacterController>();
         animator = GetComponentInChildren<Animator>();
@@ -32,30 +30,16 @@ public class PlayerMovement : MonoBehaviour
         speed = walkSpeed;
         AssignInputEvents();
     }
-    
+
 
     private void Update()
     {
         ApplyMovement();
-        AimTowardsMouse();
-        AnimaterControllers();
+        ApplyRotation();
+        AnimatorControllers();
     }
 
-
-    private void AimTowardsMouse()
-    {
-        Ray ray = Camera.main.ScreenPointToRay(aimInput);
-        if (Physics.Raycast(ray, out var hitInfo, Mathf.Infinity, aimLayerMask))
-        {
-            lookDirection = hitInfo.point - transform.position;
-            lookDirection.y = 0f;
-            lookDirection.Normalize();
-            transform.forward = lookDirection;
-            aim.position = new Vector3(hitInfo.point.x, transform.position.y + 1, hitInfo.point.z);
-        }
-    }
-
-    private void AnimaterControllers()
+    private void AnimatorControllers()
     {
         float xVelocity = Vector3.Dot(moveDirection.normalized, transform.right);
         float zVelocity = Vector3.Dot(moveDirection.normalized, transform.forward);
@@ -65,7 +49,16 @@ public class PlayerMovement : MonoBehaviour
         bool playAnimation = isRunning && moveDirection.magnitude > 0;
         animator.SetBool("isRunning", playAnimation);
     }
+    private void ApplyRotation()
+    {
+        Vector3 lookDirection = player.aim.GetMouseHitInfo().point - transform.position;
+        lookDirection.y = 0f;
+        lookDirection.Normalize();
 
+        Quaternion desiredRotation = Quaternion.LookRotation(lookDirection);
+        //slerp是球线性插值 弧度更均匀
+        transform.rotation = Quaternion.Slerp(transform.rotation, desiredRotation, turnSpeed * Time.deltaTime);
+    }
     private void ApplyMovement()
     {
         moveDirection = new Vector3(moveInput.x, 0, moveInput.y);
@@ -78,7 +71,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void ApplyGravity()
     {
-        if(characterController.isGrounded == false)
+        if (characterController.isGrounded == false)
         {
             verticalVelocity -= 9.81f * Time.deltaTime;
             moveDirection.y = verticalVelocity;
@@ -92,9 +85,6 @@ public class PlayerMovement : MonoBehaviour
 
         controls.Character.Movement.performed += context => moveInput = context.ReadValue<Vector2>();
         controls.Character.Movement.canceled += context => moveInput = Vector2.zero;
-
-        controls.Character.Aim.performed += context => aimInput = context.ReadValue<Vector2>();
-        controls.Character.Aim.canceled += context => aimInput = Vector2.zero;
 
         controls.Character.Run.performed += context =>
         {
