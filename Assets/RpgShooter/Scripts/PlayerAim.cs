@@ -7,6 +7,8 @@ public class PlayerAim : MonoBehaviour
 {
     private Player player;
     private PlayerControls controls;
+    [SerializeField] private bool isAimingPrecisly;
+    [SerializeField] private bool isLockingTarget;
     [Range(0.5f, 1f)]
     #region unUsed
     [SerializeField] private float minCameraDistance = 1f;
@@ -36,12 +38,29 @@ public class PlayerAim : MonoBehaviour
 
     private void Update()
     {
-        aim.position = new Vector3(GetMouseHitInfo().point.x, transform.position.y + 1f, GetMouseHitInfo().point.z);
-        // aim.position = Vector3.Lerp(aim.position, SetAimPosition(), aimSensetivity * Time.deltaTime);
-        MoveCamera();
+        if(Input.GetKeyDown(KeyCode.P))
+            isAimingPrecisly = !isAimingPrecisly;
+        if(Input.GetKeyDown(KeyCode.L))
+            isLockingTarget = !isLockingTarget;
+        UpdateAimPosition();
+        UpadteCamera();
     }
 
-    private void MoveCamera()
+    private void UpdateAimPosition()
+    {
+        Transform target = Target();
+        if(target != null && isLockingTarget)
+        {
+            aim.position = target.position;
+            return;
+        }
+        aim.position = GetMouseHitInfo().point;
+        if (!GetIsAimPrecisly())
+            aim.position = new Vector3(GetMouseHitInfo().point.x, transform.position.y + 1f, GetMouseHitInfo().point.z);
+        // aim.position = Vector3.Lerp(aim.position, SetAimPosition(), aimSensetivity * Time.deltaTime);
+    }
+
+    private void UpadteCamera()
     {
         if (aimInput.x > 1520 && aimInput.y > 780)
         {
@@ -70,6 +89,19 @@ public class PlayerAim : MonoBehaviour
         }
     }
 
+    public Transform Target()
+    {
+        Transform target = null;
+        if(GetMouseHitInfo().transform.GetComponent<Target>() != null)
+        {
+            target = GetMouseHitInfo().transform;
+        }
+        return target;
+    }
+    public bool GetIsAimPrecisly()
+    {
+        return isAimingPrecisly;
+    }
     private Vector3 SetAimPosition()
     {
         //摄像机角度 如果向下运动按最大摄像机距离会跑出屏幕

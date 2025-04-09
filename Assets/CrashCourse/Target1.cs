@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Target : MonoBehaviour
+public class Target1 : MonoBehaviour
 {
     [SerializeField] private Material gotHitMaterial;
     
