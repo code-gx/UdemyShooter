@@ -7,6 +7,9 @@ public class PlayerAim : MonoBehaviour
 {
     private Player player;
     private PlayerControls controls;
+    [Header("Aim Laser")]
+    [SerializeField] private LineRenderer aimLaser;
+
     [SerializeField] private bool isAimingPrecisly;
     [SerializeField] private bool isLockingTarget;
     [Range(0.5f, 1f)]
@@ -21,7 +24,7 @@ public class PlayerAim : MonoBehaviour
     [SerializeField] private Transform aim;
     [SerializeField] private LayerMask aimLayerMask;
 
-    private Vector2 aimInput;
+    private Vector2 mouseInput;
     private RaycastHit lastMouseHit;
     [Header("Camera info")]
     [SerializeField] private CinemachineVirtualCamera virtualCamera;
@@ -42,8 +45,22 @@ public class PlayerAim : MonoBehaviour
             isAimingPrecisly = !isAimingPrecisly;
         if(Input.GetKeyDown(KeyCode.L))
             isLockingTarget = !isLockingTarget;
+        UpdateAimLaser();
         UpdateAimPosition();
         UpadteCamera();
+    }
+
+    private void UpdateAimLaser()
+    {
+        Transform gunPoint = player.weapon.GunPoint();
+        aimLaser.SetPosition(0, gunPoint.position);
+        float distance = 5f;
+        Vector3 endPoint = gunPoint.forward * distance + gunPoint.position;
+        if (Physics.Raycast(gunPoint.position, gunPoint.forward, out var hitInfo, distance ))
+        {
+            endPoint = hitInfo.point;
+        }
+        aimLaser.SetPosition(1, endPoint);
     }
 
     private void UpdateAimPosition()
@@ -62,22 +79,22 @@ public class PlayerAim : MonoBehaviour
 
     private void UpadteCamera()
     {
-        if (aimInput.x > 1520 && aimInput.y > 780)
+        if (mouseInput.x > 1520 && mouseInput.y > 780)
         {
             cinemachineCompoent.m_ScreenX = Mathf.Lerp(cinemachineCompoent.m_ScreenX, 0.25f, Time.deltaTime * cameraMoveSpeed);
             cinemachineCompoent.m_ScreenY = Mathf.Lerp(cinemachineCompoent.m_ScreenY, 0.75f, Time.deltaTime * cameraMoveSpeed);
         }
-        else if (aimInput.x > 1520 && aimInput.y < 300)
+        else if (mouseInput.x > 1520 && mouseInput.y < 300)
         {
             cinemachineCompoent.m_ScreenX = Mathf.Lerp(cinemachineCompoent.m_ScreenX, 0.25f, Time.deltaTime * cameraMoveSpeed);
             cinemachineCompoent.m_ScreenY = Mathf.Lerp(cinemachineCompoent.m_ScreenY, 0.35f, Time.deltaTime * cameraMoveSpeed);
         }
-        else if (aimInput.x < 400 && aimInput.y < 300)
+        else if (mouseInput.x < 400 && mouseInput.y < 300)
         {
             cinemachineCompoent.m_ScreenX = Mathf.Lerp(cinemachineCompoent.m_ScreenX, 0.75f, Time.deltaTime * cameraMoveSpeed);
             cinemachineCompoent.m_ScreenY = Mathf.Lerp(cinemachineCompoent.m_ScreenY, 0.35f, Time.deltaTime * cameraMoveSpeed);
         }
-        else if (aimInput.x < 400 && aimInput.y > 780)
+        else if (mouseInput.x < 400 && mouseInput.y > 780)
         {
             cinemachineCompoent.m_ScreenX = Mathf.Lerp(cinemachineCompoent.m_ScreenX, 0.75f, Time.deltaTime * cameraMoveSpeed);
             cinemachineCompoent.m_ScreenY = Mathf.Lerp(cinemachineCompoent.m_ScreenY, 0.7f, Time.deltaTime * cameraMoveSpeed);
@@ -98,10 +115,12 @@ public class PlayerAim : MonoBehaviour
         }
         return target;
     }
-    public bool GetIsAimPrecisly()
-    {
-        return isAimingPrecisly;
-    }
+
+    public Transform Aim() => aim;
+
+    public bool GetIsAimPrecisly() => isAimingPrecisly;
+
+    //废弃
     private Vector3 SetAimPosition()
     {
         //摄像机角度 如果向下运动按最大摄像机距离会跑出屏幕
@@ -123,7 +142,7 @@ public class PlayerAim : MonoBehaviour
     }
     public RaycastHit GetMouseHitInfo()
     {
-        Ray ray = Camera.main.ScreenPointToRay(aimInput);
+        Ray ray = Camera.main.ScreenPointToRay(mouseInput);
         if (Physics.Raycast(ray, out var hitInfo, Mathf.Infinity, aimLayerMask))
         {
             lastMouseHit = hitInfo;
@@ -134,7 +153,7 @@ public class PlayerAim : MonoBehaviour
     private void AssignInputEvents()
     {
         controls = player.controls;
-        controls.Character.Aim.performed += context => aimInput = context.ReadValue<Vector2>();
-        controls.Character.Aim.canceled += context => aimInput = Vector2.zero;
+        controls.Character.Aim.performed += context => mouseInput = context.ReadValue<Vector2>();
+        controls.Character.Aim.canceled += context => mouseInput = Vector2.zero;
     }
 }

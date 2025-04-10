@@ -11,7 +11,6 @@ public class PlayerWeaponController : MonoBehaviour
     [SerializeField] private Transform gunPoint;
 
     [SerializeField] private Transform weaponHolder;
-    [SerializeField] private Transform aim;
 
     private void Start()
     {
@@ -20,6 +19,7 @@ public class PlayerWeaponController : MonoBehaviour
     }
     private void Shoot()
     {
+        Transform aim = player.aim.Aim();
         gunPoint.LookAt(aim);
         weaponHolder.LookAt(aim);
         GameObject newBullet = 
@@ -36,4 +36,6 @@ public class PlayerWeaponController : MonoBehaviour
 
         Gizmos.DrawLine(gunPoint.position, gunPoint.position + 25 * gunPoint.forward);
     }
+
+    public Transform GunPoint() => gunPoint;
 }
