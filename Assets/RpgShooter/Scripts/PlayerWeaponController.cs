@@ -12,6 +12,9 @@ public class PlayerWeaponController : MonoBehaviour
 
     [SerializeField] private Transform weaponHolder;
 
+    //通过速度修改质量的基准速度
+    private const float REFRENCE_BULLET_SPEED = 20;
+
     private void Start()
     {
         player = GetComponent<Player>();
@@ -25,6 +28,7 @@ public class PlayerWeaponController : MonoBehaviour
         GameObject newBullet = 
                 Instantiate(bulletPrefab, gunPoint.position,Quaternion.LookRotation(gunPoint.forward));
         newBullet.GetComponent<Rigidbody>().velocity = newBullet.transform.forward * bulletSpeed;
+        newBullet.GetComponent<Rigidbody>().mass = REFRENCE_BULLET_SPEED /bulletSpeed;
         Destroy(newBullet, 10);
         GetComponentInChildren<Animator>().SetTrigger("Fire");
     }

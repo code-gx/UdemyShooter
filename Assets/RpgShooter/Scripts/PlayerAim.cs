@@ -68,7 +68,13 @@ public class PlayerAim : MonoBehaviour
         Transform target = Target();
         if(target != null && isLockingTarget)
         {
-            aim.position = target.position;
+            
+            if(target.GetComponent<Renderer>())
+            {
+                aim.position = target.GetComponent<Renderer>().bounds.center;
+            }
+            else
+                aim.position = target.position;
             return;
         }
         aim.position = GetMouseHitInfo().point;
