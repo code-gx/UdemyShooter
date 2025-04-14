@@ -4,9 +4,22 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
+    [SerializeField] private GameObject bulletImpactFX;
     private Rigidbody rb => GetComponent<Rigidbody>();
-    private void OnCollisionEnter(Collision other) {
+    private void OnCollisionEnter(Collision other)
+    {
         // rb.constraints = RigidbodyConstraints.FreezeAll;
-        Destroy(gameObject);    
+        CreateImpactFx(other);
+        Destroy(gameObject);
+    }
+
+    private void CreateImpactFx(Collision other)
+    {
+        if (other.contacts.Length > 0)
+        {
+            var contact = other.contacts[0];
+            GameObject newImpactFx = Instantiate(bulletImpactFX, contact.point, Quaternion.LookRotation(contact.normal));
+            Destroy(newImpactFx, 1.0f);
+        }
     }
 }
