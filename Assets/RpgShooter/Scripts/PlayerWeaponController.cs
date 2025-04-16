@@ -6,6 +6,10 @@ using UnityEngine;
 public class PlayerWeaponController : MonoBehaviour
 {
     private Player player;
+    
+    [Header("Bullet details")]
+    [SerializeField] private Weapon currentWeapon;
+
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private float bulletSpeed;
     [SerializeField] private Transform gunPoint;
@@ -15,13 +19,44 @@ public class PlayerWeaponController : MonoBehaviour
     //通过速度修改质量的基准速度
     private const float REFRENCE_BULLET_SPEED = 20;
 
+    [Header("Inventory")]
+    [SerializeField] private List<Weapon> weaponSlots;
+
     private void Start()
     {
         player = GetComponent<Player>();
-        player.controls.Character.Fire.performed += context => Shoot();
+        AssignInputEvents();
+        currentWeapon.ammo = currentWeapon.maxAmmo;
+    }
+
+    private void AssignInputEvents()
+    {
+        PlayerControls controls = player.controls;
+        controls.Character.Fire.performed += context => Shoot();
+        controls.Character.EquipSlot1.performed += context => EquipWeapon(0);
+        controls.Character.EquipSlot2.performed += context => EquipWeapon(1);
+    }
+
+    private void EquipWeapon(int i)
+    {
+        currentWeapon = weaponSlots[i];
+    }
+
+    private void DropWeapon()
+    {
+        if(weaponSlots.Count <= 1)
+        {
+            return;
+        }
+        weaponSlots.Remove(currentWeapon);
     }
     private void Shoot()
     {
+        if(currentWeapon.ammo <= 0)
+        {
+            return;
+        }
+        currentWeapon.ammo--;
         Transform aim = player.aim.Aim();
         gunPoint.LookAt(aim);
         weaponHolder.LookAt(aim);
