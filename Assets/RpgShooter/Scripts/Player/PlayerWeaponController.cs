@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics;
+using UnityEditor.Rendering.LookDev;
 using UnityEngine;
 
 public class PlayerWeaponController : MonoBehaviour
@@ -20,6 +21,7 @@ public class PlayerWeaponController : MonoBehaviour
     private const float REFRENCE_BULLET_SPEED = 20;
 
     [Header("Inventory")]
+    [SerializeField] private int maxWeaponSlots = 2;
     [SerializeField] private List<Weapon> weaponSlots;
 
     private void Start()
@@ -35,6 +37,7 @@ public class PlayerWeaponController : MonoBehaviour
         controls.Character.Fire.performed += context => Shoot();
         controls.Character.EquipSlot1.performed += context => EquipWeapon(0);
         controls.Character.EquipSlot2.performed += context => EquipWeapon(1);
+        controls.Character.DropCurrentWeapon.performed += context => DropWeapon();
     }
 
     private void EquipWeapon(int i)
@@ -49,6 +52,17 @@ public class PlayerWeaponController : MonoBehaviour
             return;
         }
         weaponSlots.Remove(currentWeapon);
+        currentWeapon = weaponSlots[0];
+    }
+    
+    public void PickupWeapon(Weapon newWeapon)
+    {
+        if(weaponSlots.Count >= maxWeaponSlots)
+        {
+            Debug.Log("no slots");
+            return;
+        }
+        weaponSlots.Add(newWeapon);
     }
     private void Shoot()
     {
