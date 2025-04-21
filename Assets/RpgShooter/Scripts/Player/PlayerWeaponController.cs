@@ -23,36 +23,53 @@ public class PlayerWeaponController : MonoBehaviour
     [Header("Inventory")]
     [SerializeField] private int maxWeaponSlots = 2;
     [SerializeField] private List<Weapon> weaponSlots;
-
+    public Transform GunPoint() => gunPoint;
+    public Weapon CurrentWeapon() => currentWeapon;
+    public bool isHasOnlyOneWeapon() => weaponSlots.Count <= 1;
+    public Weapon BackupWeapon()
+    {
+        foreach(var weapon in weaponSlots)
+        {
+            if(weapon != currentWeapon)
+            {
+                return weapon;
+            }
+        }
+        return null;
+    }
     private void Start()
     {
         player = GetComponent<Player>();
         AssignInputEvents();
-        currentWeapon.ammo = currentWeapon.maxAmmo;
+        Invoke("EquipStartWeapon", 0.1f);
     }
 
-    private void AssignInputEvents()
+    private void EquipStartWeapon()
     {
-        PlayerControls controls = player.controls;
-        controls.Character.Fire.performed += context => Shoot();
-        controls.Character.EquipSlot1.performed += context => EquipWeapon(0);
-        controls.Character.EquipSlot2.performed += context => EquipWeapon(1);
-        controls.Character.DropCurrentWeapon.performed += context => DropWeapon();
+        currentWeapon = weaponSlots[0];
+        player.weaponVisuals.SwitchCurrentWeaponModel();
+        player.weaponVisuals.SwitchOnBackupWeaponModels();
     }
 
+    void OnDrawGizmos()
+    {
+        Gizmos.DrawLine(weaponHolder.position, weaponHolder.position + 25 * weaponHolder.transform.forward);
+        Gizmos.color = Color.yellow;
+
+        Gizmos.DrawLine(gunPoint.position, gunPoint.position + 25 * gunPoint.forward);
+    }
+    #region Slots management - Pickup\Equip\Drop Weapon
     private void EquipWeapon(int i)
     {
         currentWeapon = weaponSlots[i];
+        player.weaponVisuals.PlayWeaponEquipAnimation();
     }
 
     private void DropWeapon()
     {
-        if(weaponSlots.Count <= 1)
-        {
-            return;
-        }
+        if(isHasOnlyOneWeapon()) return;
         weaponSlots.Remove(currentWeapon);
-        currentWeapon = weaponSlots[0];
+        EquipWeapon(0);
     }
     
     public void PickupWeapon(Weapon newWeapon)
@@ -63,14 +80,15 @@ public class PlayerWeaponController : MonoBehaviour
             return;
         }
         weaponSlots.Add(newWeapon);
+        player.weaponVisuals.SwitchOnBackupWeaponModels();
     }
+    #endregion
     private void Shoot()
     {
-        if(currentWeapon.ammo <= 0)
+        if(!currentWeapon.CanShoot())
         {
             return;
         }
-        currentWeapon.ammo--;
         Transform aim = player.aim.Aim();
         gunPoint.LookAt(aim);
         weaponHolder.LookAt(aim);
@@ -82,13 +100,20 @@ public class PlayerWeaponController : MonoBehaviour
         GetComponentInChildren<Animator>().SetTrigger("Fire");
     }
 
-    void OnDrawGizmos()
+    #region Input Events
+    private void AssignInputEvents()
     {
-        Gizmos.DrawLine(weaponHolder.position, weaponHolder.position + 25 * weaponHolder.transform.forward);
-        Gizmos.color = Color.yellow;
-
-        Gizmos.DrawLine(gunPoint.position, gunPoint.position + 25 * gunPoint.forward);
+        PlayerControls controls = player.controls;
+        controls.Character.Fire.performed += context => Shoot();
+        controls.Character.EquipSlot1.performed += context => EquipWeapon(0);
+        controls.Character.EquipSlot2.performed += context => EquipWeapon(1);
+        controls.Character.DropCurrentWeapon.performed += context => DropWeapon();
+        controls.Character.Reload.performed += context => 
+        {
+            if (!currentWeapon.CanReload())
+                return;
+            player.weaponVisuals.PlayReloadAnimation();
+        };
     }
-
-    public Transform GunPoint() => gunPoint;
+    #endregion
 }

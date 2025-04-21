@@ -4,25 +4,30 @@ using UnityEngine;
 
 public class PlayerAnimationEvents : MonoBehaviour
 {
-    private PlayerWeaponVisuals controller;
+    private PlayerWeaponVisuals visualController;
+    private PlayerWeaponController playerWeaponController;
     void Start()
     {
-        controller = GetComponentInParent<PlayerWeaponVisuals>();
+        visualController = GetComponentInParent<PlayerWeaponVisuals>();
+        playerWeaponController = GetComponentInParent<PlayerWeaponController>();
     }
 
     public void onReloadDone()
     {
-        controller.MaximizeRigWeight();
+        visualController.MaximizeRigWeight();
+        playerWeaponController.CurrentWeapon().Reload();
     }
 
     public void onWeaponGrabSoonDone()
     {
-        controller.MaximizeRigWeight();
-        controller.MaximizeLeftHandIKWeight();   
+        visualController.MaximizeRigWeight();
+        visualController.MaximizeLeftHandIKWeight();   
     }
 
     public void onWeaponGrabDone()
     {
-        controller.SetGrabBusy(false);
+        visualController.SetEquipBusy(false);
     }
+
+    public void SwitchWeaponModel() => visualController.SwitchCurrentWeaponModel();
 }

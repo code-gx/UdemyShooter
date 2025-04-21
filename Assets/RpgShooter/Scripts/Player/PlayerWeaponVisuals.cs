@@ -1,27 +1,15 @@
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
-public enum Weapon_Grab_Type
-{
-    SideGrab,
-    BackGrab,
-}
-
 public class PlayerWeaponVisuals : MonoBehaviour
 {
+    private Player player;
     private Animator anim;
-    private bool busyGrabWeapon;
-    #region Gun transforms region
-    [SerializeField] private Transform[] gunTransforms;
-    [SerializeField] private Transform pistol;
-    [SerializeField] private Transform revolver;
-    [SerializeField] private Transform autoRifle;
-    [SerializeField] private Transform shotGun;
-    [SerializeField] private Transform sniperRifle;
+    private bool busyEquipWeapon;
 
-    private Transform currentGun;
-
-    #endregion
+    [SerializeField] private WeaponModel[] weaponModels;
+    [SerializeField] private BackupWeaponModel[] backupWeaponModels;
+    
     [Header("left hand IK")]
     [SerializeField] private TwoBoneIKConstraint leftHandIK;
     [SerializeField] private Transform leftHandTarget;
@@ -38,22 +26,22 @@ public class PlayerWeaponVisuals : MonoBehaviour
     {
         anim = GetComponentInChildren<Animator>();
         rig = GetComponentInChildren<Rig>();
-        SwitchOn(pistol);
+        weaponModels = GetComponentsInChildren<WeaponModel>(true);
+        backupWeaponModels = GetComponentsInChildren<BackupWeaponModel>(true);
+        player = GetComponent<Player>();
+        //先保证currentweapon初始化完
+        Invoke("InitWeaponReloadAndEquipSpeed", 0.11f);
     }
 
     private void Update()
     {
-        CheckWeaponSwitch();
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            anim.SetTrigger("Reload");
-            ReduceRigWeight();
-        }
-
         UpdateRigWeight();
         UpdateLeftHandIKWeight();
     }
 
+    #region  rig Animation Method
+    public void MaximizeRigWeight() => shouldIncreaseRigWeight = true;
+    public void MaximizeLeftHandIKWeight() => shouldIncreaseLeftHandIKWeight = true;
     private void UpdateLeftHandIKWeight()
     {
         if (shouldIncreaseLeftHandIKWeight)
@@ -83,81 +71,60 @@ public class PlayerWeaponVisuals : MonoBehaviour
         rig.weight = 0.15f;
     }
 
-    public void MaximizeRigWeight() => shouldIncreaseRigWeight = true;
-    public void MaximizeLeftHandIKWeight() => shouldIncreaseLeftHandIKWeight = true;
-    private void PlayWeaponGrabAnimation(Weapon_Grab_Type grabType)
-    {
-        //主要是手腕ik 影响了切枪的动作
-        ReduceRigWeight();
-        leftHandIK.weight = 0;
-        anim.SetBool("BusyGrabbingWeapon", true);
-        anim.SetFloat("WeaponGrabType", (float)grabType);
-        anim.SetTrigger("WeaponGrab");
-
-        SetGrabBusy(true);
-    }
-
-    public void SetGrabBusy(bool flag)
-    {
-        busyGrabWeapon = flag;
-        anim.SetBool("BusyGrabbingWeapon", busyGrabWeapon);
-    }
-    
-    private void CheckWeaponSwitch()
-    {
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            SwitchOn(pistol);
-            SwitchAnimationLayer(1);
-            PlayWeaponGrabAnimation(Weapon_Grab_Type.SideGrab);
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            SwitchOn(revolver);
-            SwitchAnimationLayer(1);
-            PlayWeaponGrabAnimation(Weapon_Grab_Type.SideGrab);
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            SwitchOn(autoRifle);
-            SwitchAnimationLayer(1);
-            PlayWeaponGrabAnimation(Weapon_Grab_Type.SideGrab);
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha4))
-        {
-            SwitchOn(shotGun);
-            SwitchAnimationLayer(2);
-            PlayWeaponGrabAnimation(Weapon_Grab_Type.BackGrab);
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha5))
-        {
-            SwitchOn(sniperRifle);
-            SwitchAnimationLayer(3);
-            PlayWeaponGrabAnimation(Weapon_Grab_Type.BackGrab);
-        }
-    }
-
-    private void SwitchOn(Transform gunTransform)
-    {
-        SwitchOffGuns();
-        gunTransform.gameObject.SetActive(true);
-        currentGun = gunTransform;
-        AttachLeftHand();
-    }
-
-    private void SwitchOffGuns()
-    {
-        for (int i = 0; i < gunTransforms.Length; i ++)
-        {
-            gunTransforms[i].gameObject.SetActive(false);
-        }
-    }
 
     private void AttachLeftHand()
     {
-        Transform targetTransform = currentGun.GetComponentInChildren<LeftHandTransform>().transform;
+        Transform targetTransform = CurrentWeaponModel().holdPoint;
         leftHandTarget.localPosition = targetTransform.localPosition;
         leftHandTarget.localRotation = targetTransform.localRotation;
+    }
+    #endregion
+    
+
+    public void SetEquipBusy(bool flag)
+    {
+        busyEquipWeapon = flag;
+        anim.SetBool("BusyEquipWeapon", busyEquipWeapon);
+    }
+    
+    public void SwitchCurrentWeaponModel()
+    {
+        SwitchAnimationLayer((int)CurrentWeaponModel().holdTpye);
+        SwitchOffWeaponModels();
+        SwitchOffBackupWeaponModels();
+        SwitchOnBackupWeaponModels();
+        CurrentWeaponModel().gameObject.SetActive(true);
+        AttachLeftHand();
+    }
+
+    public void SwitchOffWeaponModels()
+    {
+        for (int i = 0; i < weaponModels.Length; i ++)
+        {
+            weaponModels[i].gameObject.SetActive(false);
+        }
+    }
+
+    public void SwitchOffBackupWeaponModels()
+    {
+        foreach (var backupWeapon in backupWeaponModels)
+        {
+            backupWeapon.gameObject.SetActive(false);
+        }
+    }
+
+    public void SwitchOnBackupWeaponModels()
+    {
+        if (player.weapon.isHasOnlyOneWeapon())
+            return;
+        Weapon_Type backupWeaponType = player.weapon.BackupWeapon().weaponType;
+        foreach (var backupWeapon in backupWeaponModels)
+        {
+            if(backupWeaponType == backupWeapon.weaponType)
+            {
+                backupWeapon.gameObject.SetActive(true);
+            }
+        }
     }
 
     private void SwitchAnimationLayer(int layerIndex)
@@ -173,5 +140,66 @@ public class PlayerWeaponVisuals : MonoBehaviour
                 anim.SetLayerWeight(i, 0);
             }
         }
+    }
+
+    public void PlayReloadAnimation()
+    {
+        if(busyEquipWeapon)
+        {
+            return;
+        }
+        anim.SetTrigger("Reload");
+        ReduceRigWeight();
+    }
+
+    public WeaponModel CurrentWeaponModel()
+    {
+        Weapon currentWeapn = player.weapon.CurrentWeapon(); 
+        return GetWeaponModel(currentWeapn.weaponType);
+    }
+
+    public WeaponModel GetWeaponModel(Weapon_Type type)
+    {
+        for(int i = 0; i < weaponModels.Length; i++)
+        {
+            if(weaponModels[i].weaponType == type)
+            {
+                return weaponModels[i];
+            }
+        }
+        return null;
+    }
+
+    public BackupWeaponModel GetBackupWeaponModel(Weapon_Type type)
+    {
+        for(int i = 0; i < backupWeaponModels.Length; i++)
+        {
+            if(backupWeaponModels[i].weaponType == type)
+            {
+                return backupWeaponModels[i];
+            }
+        }
+        return null;
+    }
+
+    public void InitWeaponReloadAndEquipSpeed()
+    {
+        anim.SetFloat("EquipSpeed", player.weapon.CurrentWeapon().equipSpeed);
+        anim.SetFloat("ReloadSpeed", player.weapon.CurrentWeapon().reloadSpeed);
+    }
+
+    public void PlayWeaponEquipAnimation()
+    {
+        Weapon_Equip_Type equipType = CurrentWeaponModel().equipType;
+        Weapon currentWeapon = player.weapon.CurrentWeapon();
+        //主要是手腕ik 影响了切枪的动作
+        ReduceRigWeight();
+        leftHandIK.weight = 0;
+        anim.SetFloat("EquipSpeed", currentWeapon.equipSpeed);
+        anim.SetFloat("ReloadSpeed", currentWeapon.reloadSpeed);
+        anim.SetFloat("EquipType", (float)equipType);
+        anim.SetTrigger("EquipWeapon");
+
+        SetEquipBusy(true);
     }
 }
