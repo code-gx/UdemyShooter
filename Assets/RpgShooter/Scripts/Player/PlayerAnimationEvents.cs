@@ -16,6 +16,7 @@ public class PlayerAnimationEvents : MonoBehaviour
     {
         visualController.MaximizeRigWeight();
         playerWeaponController.CurrentWeapon().Reload();
+        playerWeaponController.SetWeaponReady(true);
     }
 
     public void onWeaponGrabSoonDone()
@@ -26,7 +27,7 @@ public class PlayerAnimationEvents : MonoBehaviour
 
     public void onWeaponGrabDone()
     {
-        visualController.SetEquipBusy(false);
+        playerWeaponController.SetWeaponReady(true);
     }
 
     public void SwitchWeaponModel() => visualController.SwitchCurrentWeaponModel();

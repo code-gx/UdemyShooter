@@ -5,7 +5,6 @@ public class PlayerWeaponVisuals : MonoBehaviour
 {
     private Player player;
     private Animator anim;
-    private bool busyEquipWeapon;
 
     [SerializeField] private WeaponModel[] weaponModels;
     [SerializeField] private BackupWeaponModel[] backupWeaponModels;
@@ -80,13 +79,6 @@ public class PlayerWeaponVisuals : MonoBehaviour
     }
     #endregion
     
-
-    public void SetEquipBusy(bool flag)
-    {
-        busyEquipWeapon = flag;
-        anim.SetBool("BusyEquipWeapon", busyEquipWeapon);
-    }
-    
     public void SwitchCurrentWeaponModel()
     {
         SwitchAnimationLayer((int)CurrentWeaponModel().holdTpye);
@@ -142,16 +134,6 @@ public class PlayerWeaponVisuals : MonoBehaviour
         }
     }
 
-    public void PlayReloadAnimation()
-    {
-        if(busyEquipWeapon)
-        {
-            return;
-        }
-        anim.SetTrigger("Reload");
-        ReduceRigWeight();
-    }
-
     public WeaponModel CurrentWeaponModel()
     {
         Weapon currentWeapn = player.weapon.CurrentWeapon(); 
@@ -188,6 +170,13 @@ public class PlayerWeaponVisuals : MonoBehaviour
         anim.SetFloat("ReloadSpeed", player.weapon.CurrentWeapon().reloadSpeed);
     }
 
+    public void PlayFireAnimation() => anim.SetTrigger("Fire");
+
+    public void PlayReloadAnimation()
+    {
+        anim.SetTrigger("Reload");
+        ReduceRigWeight();
+    }
     public void PlayWeaponEquipAnimation()
     {
         Weapon_Equip_Type equipType = CurrentWeaponModel().equipType;
@@ -200,6 +189,5 @@ public class PlayerWeaponVisuals : MonoBehaviour
         anim.SetFloat("EquipType", (float)equipType);
         anim.SetTrigger("EquipWeapon");
 
-        SetEquipBusy(true);
     }
 }

@@ -372,25 +372,85 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -6778606181908912644, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
+      propertyPath: m_Time
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: -6778606181908912644, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
+      propertyPath: m_Emitting
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -6778606181908912644, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
+      propertyPath: m_Autodestruct
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -6778606181908912644, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
+      propertyPath: m_MinVertexDistance
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: -6778606181908912644, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
+      propertyPath: m_ApplyActiveColorSpace
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -6778606181908912644, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
+      propertyPath: m_Parameters.shadowBias
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: -6778606181908912644, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -6778606181908912644, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].time
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -6778606181908912644, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[1].time
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -6778606181908912644, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].value
+      value: 0.22847639
+      objectReference: {fileID: 0}
+    - target: {fileID: -6778606181908912644, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[1].value
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -6778606181908912644, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].inSlope
+      value: -0.14681435
+      objectReference: {fileID: 0}
+    - target: {fileID: -6778606181908912644, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].inWeight
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -6778606181908912644, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].outSlope
+      value: -0.14681435
+      objectReference: {fileID: 0}
+    - target: {fileID: -6778606181908912644, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].outWeight
+      value: 0.14313346
+      objectReference: {fileID: 0}
     - target: {fileID: 1073982708139751261, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
       propertyPath: m_Name
       value: Bullet
       objectReference: {fileID: 0}
     - target: {fileID: 1073982708139751261, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2764556628748219165, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3.874
+      value: -0.69
       objectReference: {fileID: 0}
     - target: {fileID: 2764556628748219165, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.04
+      value: 0.725
       objectReference: {fileID: 0}
     - target: {fileID: 2764556628748219165, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -7.855
+      value: -1.358
       objectReference: {fileID: 0}
     - target: {fileID: 2764556628748219165, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1981,6 +2041,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentWeapon:
     weaponType: 0
+    shootType: 0
+    fireRate: 1
     bulletsInMagazine: 0
     magazineCapacity: 6
     totalReserveAmmo: 50
@@ -1988,17 +2050,20 @@ MonoBehaviour:
     equipSpeed: 3
   bulletPrefab: {fileID: 1073982708139751261, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
   bulletSpeed: 20
-  gunPoint: {fileID: 974891225}
   weaponHolder: {fileID: 675401090}
   maxWeaponSlots: 2
   weaponSlots:
   - weaponType: 0
+    shootType: 0
+    fireRate: 5
     bulletsInMagazine: 10
     magazineCapacity: 10
     totalReserveAmmo: 50
     reloadSpeed: 2
     equipSpeed: 2
-  - weaponType: 4
+  - weaponType: 2
+    shootType: 1
+    fireRate: 5
     bulletsInMagazine: 30
     magazineCapacity: 30
     totalReserveAmmo: 100
@@ -3277,11 +3342,11 @@ LineRenderer:
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 0.9056604, g: 0.18369527, b: 0.18369527, a: 0}
+      key0: {r: 0.9056604, g: 0.18369527, b: 0.18369527, a: 0.22352941}
       key1: {r: 1, g: 0, b: 0.14465427, a: 1}
       key2: {r: 0.93333334, g: 0.73324126, b: 0.2078431, a: 1}
-      key3: {r: 0, g: 0, b: 0, a: 0}
-      key4: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0.07017702}
+      key4: {r: 0, g: 0, b: 0, a: 0.07017702}
       key5: {r: 0, g: 0, b: 0, a: 0}
       key6: {r: 0, g: 0, b: 0, a: 0}
       key7: {r: 0, g: 0, b: 0, a: 0}
@@ -3294,10 +3359,10 @@ LineRenderer:
       ctime6: 0
       ctime7: 0
       atime0: 0
-      atime1: 21010
+      atime1: 21395
       atime2: 43562
-      atime3: 65535
-      atime4: 65535
+      atime3: 64379
+      atime4: 64379
       atime5: 0
       atime6: 0
       atime7: 0
@@ -4130,6 +4195,52 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 823614198457790157, guid: 39c67a80019aeb84da2c2ac42e1349f8, type: 3}
   m_PrefabInstance: {fileID: 311396642}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1540652715
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1540652717}
+  - component: {fileID: 1540652716}
+  m_Layer: 0
+  m_Name: ObjectPool
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1540652716
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1540652715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3f2c9b8eb7847f4aa10a0eb22f0a7e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bulletPrefab: {fileID: 1073982708139751261, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
+  poolSize: 1
+--- !u!4 &1540652717
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1540652715}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.924, y: 0.8740001, z: 2.338}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1660195320
 GameObject:
   m_ObjectHideFlags: 0
@@ -6618,6 +6729,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weapon:
     weaponType: 3
+    shootType: 0
+    fireRate: 1
     bulletsInMagazine: 6
     magazineCapacity: 6
     totalReserveAmmo: 36
@@ -8375,3 +8488,4 @@ SceneRoots:
   - {fileID: 2075381188}
   - {fileID: 4574522829996989987}
   - {fileID: 7335960926728456299}
+  - {fileID: 1540652717}

@@ -52,7 +52,15 @@ public class PlayerAim : MonoBehaviour
 
     private void UpdateAimLaser()
     {
-        Transform gunPoint = player.weapon.GunPoint();
+        aimLaser.enabled = player.weapon.GetWeaponReady();
+        if(!aimLaser.enabled)
+            return;
+        WeaponModel currentWeaponModel = player.weaponVisuals.CurrentWeaponModel();
+        
+        currentWeaponModel.gunPoint.LookAt(aim);
+        currentWeaponModel.transform.LookAt(aim);
+
+        Transform gunPoint = currentWeaponModel.gunPoint;
         aimLaser.SetPosition(0, gunPoint.position);
         float distance = 5f;
         Vector3 endPoint = gunPoint.forward * distance + gunPoint.position;
