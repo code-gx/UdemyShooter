@@ -372,66 +372,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: -6778606181908912644, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
-      propertyPath: m_Time
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: -6778606181908912644, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
-      propertyPath: m_Emitting
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: -6778606181908912644, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
-      propertyPath: m_Autodestruct
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: -6778606181908912644, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
-      propertyPath: m_MinVertexDistance
-      value: 0.1
-      objectReference: {fileID: 0}
-    - target: {fileID: -6778606181908912644, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
-      propertyPath: m_ApplyActiveColorSpace
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: -6778606181908912644, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
-      propertyPath: m_Parameters.shadowBias
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: -6778606181908912644, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
-      propertyPath: m_Parameters.widthCurve.m_Curve.Array.size
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: -6778606181908912644, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
-      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].time
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -6778606181908912644, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
-      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[1].time
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: -6778606181908912644, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
-      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].value
-      value: 0.22847639
-      objectReference: {fileID: 0}
-    - target: {fileID: -6778606181908912644, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
-      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[1].value
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -6778606181908912644, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
-      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].inSlope
-      value: -0.14681435
-      objectReference: {fileID: 0}
-    - target: {fileID: -6778606181908912644, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
-      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].inWeight
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -6778606181908912644, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
-      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].outSlope
-      value: -0.14681435
-      objectReference: {fileID: 0}
-    - target: {fileID: -6778606181908912644, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
-      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].outWeight
-      value: 0.14313346
-      objectReference: {fileID: 0}
     - target: {fileID: 1073982708139751261, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
       propertyPath: m_Name
       value: Bullet
@@ -2048,6 +1988,9 @@ MonoBehaviour:
     totalReserveAmmo: 50
     reloadSpeed: 3
     equipSpeed: 3
+    baseSpread: 0
+    maxSpread: 2
+    currentSpread: 0
   bulletPrefab: {fileID: 1073982708139751261, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
   bulletSpeed: 20
   weaponHolder: {fileID: 675401090}
@@ -2061,6 +2004,9 @@ MonoBehaviour:
     totalReserveAmmo: 50
     reloadSpeed: 2
     equipSpeed: 2
+    baseSpread: 0
+    maxSpread: 2
+    currentSpread: 0
   - weaponType: 2
     shootType: 1
     fireRate: 5
@@ -2069,6 +2015,11 @@ MonoBehaviour:
     totalReserveAmmo: 100
     reloadSpeed: 1
     equipSpeed: 1
+    baseSpread: 0
+    maxSpread: 5
+    currentSpread: 0
+  fireButtonTime: 0
+  maxButtonTime: 3
 --- !u!114 &621967215
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6736,6 +6687,9 @@ MonoBehaviour:
     totalReserveAmmo: 36
     reloadSpeed: 1
     equipSpeed: 1
+    baseSpread: 0
+    maxSpread: 2
+    currentSpread: 0
 --- !u!65 &4574522829996989989
 BoxCollider:
   m_ObjectHideFlags: 0

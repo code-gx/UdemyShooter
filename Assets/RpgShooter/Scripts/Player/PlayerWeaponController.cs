@@ -23,9 +23,15 @@ public class PlayerWeaponController : MonoBehaviour
     [Header("Inventory")]
     [SerializeField] private int maxWeaponSlots = 2;
     [SerializeField] private List<Weapon> weaponSlots;
+
+    [Header("后座力时间参数")]
+    public float fireButtonTime = 0;
+    public float maxButtonTime = 3.0f;  //最大后座力时间
+
     public Transform GunPoint() => player.weaponVisuals.CurrentWeaponModel().gunPoint;
     public Weapon CurrentWeapon() => currentWeapon;
     public bool isHasOnlyOneWeapon() => weaponSlots.Count <= 1;
+    public float getFireButtonDownTimeNormalized() => fireButtonTime / maxButtonTime;
     public Weapon BackupWeapon()
     {
         foreach(var weapon in weaponSlots)
@@ -48,6 +54,16 @@ public class PlayerWeaponController : MonoBehaviour
     {
         if(isShooting)
             Shoot();
+        if (Input.GetKey(KeyCode.Mouse0))
+        {
+            if(currentWeapon.shootType == Shoot_Type.Auto && currentWeapon.HaveEnoughBullets() && GetWeaponReady())
+                fireButtonTime += Time.deltaTime;
+                fireButtonTime = Mathf.Min(fireButtonTime, maxButtonTime);
+        }
+        if (Input.GetKeyUp(KeyCode.Mouse0))
+        {
+            fireButtonTime = 0;
+        }
     }
 
     private void EquipStartWeapon()
@@ -68,7 +84,10 @@ public class PlayerWeaponController : MonoBehaviour
     #region Slots management - Pickup\Equip\Drop\Ready Weapon
     private void EquipWeapon(int i)
     {
+        if(currentWeapon == weaponSlots[i])
+            return;
         SetWeaponReady(false);
+        //数据先动 动画播放也是前端效果 不然会出错
         currentWeapon = weaponSlots[i];
         player.weaponVisuals.PlayWeaponEquipAnimation();
     }
@@ -106,8 +125,11 @@ public class PlayerWeaponController : MonoBehaviour
         GameObject newBullet = ObjectPool.instance.GetBullet();
                 // Instantiate(bulletPrefab, gunPoint.position,Quaternion.LookRotation(gunPoint.forward));
         newBullet.transform.position = GunPoint().position;
+        //很关键 如果复用对象池 get对象时先active 再设置位置 会造成拖尾不正常的效果
+        newBullet.GetComponent<TrailRenderer>().Clear();
         newBullet.transform.rotation = Quaternion.LookRotation(GunPoint().forward);
-        newBullet.GetComponent<Rigidbody>().velocity = newBullet.transform.forward * bulletSpeed;
+        Vector3 bulletDirection = currentWeapon.ApplySpread(newBullet.transform.forward, getFireButtonDownTimeNormalized());
+        newBullet.GetComponent<Rigidbody>().velocity = bulletDirection * bulletSpeed;
         newBullet.GetComponent<Rigidbody>().mass = REFRENCE_BULLET_SPEED /bulletSpeed;
         player.weaponVisuals.PlayFireAnimation();
     }

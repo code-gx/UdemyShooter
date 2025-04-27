@@ -34,7 +34,24 @@ public class Weapon
     public float reloadSpeed = 1;
     [Range(1,3)]
     public float equipSpeed = 1;
+
+    [Header("Spread")]
+    public float baseSpread = 0;
+    public float maxSpread = 4;
+    public float currentSpread;
+    public Vector3 ApplySpread(Vector3 originalDirection, float buttonTime)
+    {
+        currentSpread = getCurrentSpread(baseSpread, maxSpread, buttonTime);
+        float randomizedValue = UnityEngine.Random.Range(-currentSpread, currentSpread);
+        Quaternion spreadRotation = Quaternion.Euler(randomizedValue,randomizedValue,randomizedValue);
+        return spreadRotation * originalDirection; 
+    }
     
+    //先快后慢的幂函数 保证后坐力越来越大
+    private float getCurrentSpread(float a, float b, float t)
+    {
+        return a + (b - a) * MathF.Pow(t, 2);
+    }
 
     public bool CanShoot()
     {
@@ -69,7 +86,7 @@ public class Weapon
         return false;
     }
 
-    private bool HaveEnoughBullets() => bulletsInMagazine > 0 ;
+    public bool HaveEnoughBullets() => bulletsInMagazine > 0 ;
 
     public void Reload()
     {

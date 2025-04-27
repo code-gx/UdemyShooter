@@ -183,6 +183,9 @@ public class PlayerWeaponVisuals : MonoBehaviour
         Weapon currentWeapon = player.weapon.CurrentWeapon();
         //主要是手腕ik 影响了切枪的动作
         ReduceRigWeight();
+        //记得重置ik增加的开关
+        shouldIncreaseRigWeight = false;
+        shouldIncreaseLeftHandIKWeight = false;
         leftHandIK.weight = 0;
         anim.SetFloat("EquipSpeed", currentWeapon.equipSpeed);
         anim.SetFloat("ReloadSpeed", currentWeapon.reloadSpeed);
