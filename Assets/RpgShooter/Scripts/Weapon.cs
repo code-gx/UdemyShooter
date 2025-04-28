@@ -24,8 +24,15 @@ public class Weapon
     [Header("Shooting details")]
     [Space]
     public Shoot_Type shootType;
-    public float fireRate = 1; //每秒射出的子弹数
+    public float defaultFireRate = 10;
+    private float fireRate; //每秒射出的子弹数
     private float lastShootTime;
+    [Header("Burst details")]
+    public bool burstModeAvailable;
+    public bool burstActive;
+    public float burstModeFireRate;
+    public int bulletsPerShot;
+    public float burstFireDely = 0.1f;
     [Header("Magazine details")]
     public int bulletsInMagazine;
     public int magazineCapacity;
@@ -44,6 +51,8 @@ public class Weapon
         currentSpread = getCurrentSpread(baseSpread, maxSpread, buttonTime);
         float randomizedValue = UnityEngine.Random.Range(-currentSpread, currentSpread);
         Quaternion spreadRotation = Quaternion.Euler(randomizedValue,randomizedValue,randomizedValue);
+        if(weaponType == Weapon_Type.Shotgun)
+            spreadRotation = Quaternion.Euler(0, randomizedValue, 0);
         return spreadRotation * originalDirection; 
     }
     
@@ -52,6 +61,23 @@ public class Weapon
     {
         return a + (b - a) * MathF.Pow(t, 2);
     }
+
+    #region Burst Region
+    public bool BurstActive() => burstActive;
+    public void ToggleBurst()
+    {
+        if(burstModeAvailable)
+            burstActive = !burstActive;
+        if(burstActive)
+        {
+            fireRate = burstModeFireRate;
+        }
+        else
+        {
+            fireRate = defaultFireRate;
+        }
+    }
+    #endregion
 
     public bool CanShoot()
     {

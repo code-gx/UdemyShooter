@@ -52,13 +52,22 @@ public class PlayerWeaponController : MonoBehaviour
 
     private void Update()
     {
-        if(isShooting)
+        if (isShooting)
             Shoot();
+        UpdateFireButtonTime();
+        if(Input.GetKeyDown(KeyCode.T))
+        {
+            currentWeapon.ToggleBurst();
+        }
+    }
+
+    private void UpdateFireButtonTime()
+    {
         if (Input.GetKey(KeyCode.Mouse0))
         {
-            if(currentWeapon.shootType == Shoot_Type.Auto && currentWeapon.HaveEnoughBullets() && GetWeaponReady())
+            if (currentWeapon.shootType == Shoot_Type.Auto && currentWeapon.HaveEnoughBullets() && GetWeaponReady())
                 fireButtonTime += Time.deltaTime;
-                fireButtonTime = Mathf.Min(fireButtonTime, maxButtonTime);
+            fireButtonTime = Mathf.Min(fireButtonTime, maxButtonTime);
         }
         if (Input.GetKeyUp(KeyCode.Mouse0))
         {
@@ -112,26 +121,54 @@ public class PlayerWeaponController : MonoBehaviour
     public void SetWeaponReady(bool ready) => weaponReady = ready;
     public bool GetWeaponReady() => weaponReady;
     #endregion
+
+    private IEnumerator BurstFire()
+    {
+        SetWeaponReady(false);
+        print(currentWeapon.bulletsPerShot);
+        for(int i = 1; i <= currentWeapon.bulletsPerShot; i++)
+        {
+            FireSingleBullet();
+            yield return new WaitForSeconds(currentWeapon.burstFireDely);
+            if (i >= currentWeapon.bulletsPerShot)
+                SetWeaponReady(true);
+        }
+    }
     private void Shoot()
     {
+        print(1);
         if (!GetWeaponReady())
             return;
-        if(!currentWeapon.CanShoot())
+        print(2);
+        if (!currentWeapon.CanShoot())
         {
             return;
         }
-        if(currentWeapon.shootType == Shoot_Type.Single)
+        print(3);
+        
+        player.weaponVisuals.PlayFireAnimation();
+
+        if (currentWeapon.shootType == Shoot_Type.Single)
             isShooting = false;
+        if (currentWeapon.BurstActive())
+        {
+            StartCoroutine(BurstFire());
+            return;
+        }
+        FireSingleBullet();
+    }
+
+    private void FireSingleBullet()
+    {
         GameObject newBullet = ObjectPool.instance.GetBullet();
-                // Instantiate(bulletPrefab, gunPoint.position,Quaternion.LookRotation(gunPoint.forward));
+        // Instantiate(bulletPrefab, gunPoint.position,Quaternion.LookRotation(gunPoint.forward));
         newBullet.transform.position = GunPoint().position;
         //很关键 如果复用对象池 get对象时先active 再设置位置 会造成拖尾不正常的效果
         newBullet.GetComponent<TrailRenderer>().Clear();
         newBullet.transform.rotation = Quaternion.LookRotation(GunPoint().forward);
         Vector3 bulletDirection = currentWeapon.ApplySpread(newBullet.transform.forward, getFireButtonDownTimeNormalized());
         newBullet.GetComponent<Rigidbody>().velocity = bulletDirection * bulletSpeed;
-        newBullet.GetComponent<Rigidbody>().mass = REFRENCE_BULLET_SPEED /bulletSpeed;
-        player.weaponVisuals.PlayFireAnimation();
+        newBullet.GetComponent<Rigidbody>().mass = REFRENCE_BULLET_SPEED / bulletSpeed;
     }
 
     private void Reload()
