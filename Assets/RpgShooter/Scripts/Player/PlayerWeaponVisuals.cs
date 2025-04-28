@@ -191,6 +191,5 @@ public class PlayerWeaponVisuals : MonoBehaviour
         anim.SetFloat("ReloadSpeed", currentWeapon.reloadSpeed);
         anim.SetFloat("EquipType", (float)equipType);
         anim.SetTrigger("EquipWeapon");
-
     }
 }

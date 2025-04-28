@@ -24,8 +24,8 @@ public class Weapon
     [Header("Shooting details")]
     [Space]
     public Shoot_Type shootType;
-    public float defaultFireRate = 10;
-    private float fireRate; //每秒射出的子弹数
+    private const float defaultFireRate = 10; //默认不开三连射的射速
+    public float fireRate = 10; //每秒射出的子弹数
     private float lastShootTime;
     [Header("Burst details")]
     public bool burstModeAvailable;
@@ -63,7 +63,17 @@ public class Weapon
     }
 
     #region Burst Region
-    public bool BurstActive() => burstActive;
+    public bool BurstActive()
+    {
+        if(weaponType == Weapon_Type.Shotgun)
+        {
+            //霰弹枪永远为瞬发多发子弹
+            burstFireDely = 0;
+            fireRate = 5;
+            return true;
+        }
+        return burstActive;
+    }
     public void ToggleBurst()
     {
         if(burstModeAvailable)
@@ -79,17 +89,11 @@ public class Weapon
     }
     #endregion
 
-    public bool CanShoot()
-    {
-        if (HaveEnoughBullets() && ReadyToFire())
-        {
-            bulletsInMagazine--;
-            return true;
-        }
-        return false;
-    }
+    //这个函数大问题 判断函数里不能更改数据 和名字有歧义
+    public bool CanShoot() => HaveEnoughBullets() && ReadyToFire();
 
-    private bool ReadyToFire()
+    //如果可以射击那就一定要射击 因为已经记录了上次射击时间
+    public bool ReadyToFire() 
     {
         if(Time.time > lastShootTime + 1 / fireRate)
         {
@@ -97,7 +101,9 @@ public class Weapon
             return true;
         }
         else
+        {
             return false;
+        }
     }
 
     #region reload methods

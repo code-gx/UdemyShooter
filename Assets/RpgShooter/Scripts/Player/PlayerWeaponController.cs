@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics;
@@ -125,27 +126,24 @@ public class PlayerWeaponController : MonoBehaviour
     private IEnumerator BurstFire()
     {
         SetWeaponReady(false);
-        print(currentWeapon.bulletsPerShot);
-        for(int i = 1; i <= currentWeapon.bulletsPerShot; i++)
+        //取二者最小值
+        int bullets = Math.Min(currentWeapon.bulletsPerShot, currentWeapon.bulletsInMagazine);
+        for(int i = 1; i <= bullets; i++)
         {
             FireSingleBullet();
             yield return new WaitForSeconds(currentWeapon.burstFireDely);
-            if (i >= currentWeapon.bulletsPerShot)
+            if (i >= bullets)
                 SetWeaponReady(true);
         }
     }
     private void Shoot()
     {
-        print(1);
         if (!GetWeaponReady())
             return;
-        print(2);
         if (!currentWeapon.CanShoot())
         {
             return;
         }
-        print(3);
-        
         player.weaponVisuals.PlayFireAnimation();
 
         if (currentWeapon.shootType == Shoot_Type.Single)
@@ -160,6 +158,7 @@ public class PlayerWeaponController : MonoBehaviour
 
     private void FireSingleBullet()
     {
+        currentWeapon.bulletsInMagazine --;
         GameObject newBullet = ObjectPool.instance.GetBullet();
         // Instantiate(bulletPrefab, gunPoint.position,Quaternion.LookRotation(gunPoint.forward));
         newBullet.transform.position = GunPoint().position;
