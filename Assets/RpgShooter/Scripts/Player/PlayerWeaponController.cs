@@ -166,6 +166,9 @@ public class PlayerWeaponController : MonoBehaviour
         newBullet.GetComponent<TrailRenderer>().Clear();
         newBullet.transform.rotation = Quaternion.LookRotation(GunPoint().forward);
         Vector3 bulletDirection = currentWeapon.ApplySpread(newBullet.transform.forward, getFireButtonDownTimeNormalized());
+        Bullet bulletScript = newBullet.GetComponent<Bullet>();
+        bulletScript.BulletSetup(currentWeapon.gunDistance);
+        
         newBullet.GetComponent<Rigidbody>().velocity = bulletDirection * bulletSpeed;
         newBullet.GetComponent<Rigidbody>().mass = REFRENCE_BULLET_SPEED / bulletSpeed;
     }

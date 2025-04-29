@@ -62,7 +62,7 @@ public class PlayerAim : MonoBehaviour
 
         Transform gunPoint = currentWeaponModel.gunPoint;
         aimLaser.SetPosition(0, gunPoint.position);
-        float distance = 5f;
+        float distance = player.weapon.CurrentWeapon().gunDistance;
         Vector3 endPoint = gunPoint.forward * distance + gunPoint.position;
         if (Physics.Raycast(gunPoint.position, gunPoint.forward, out var hitInfo, distance ))
         {

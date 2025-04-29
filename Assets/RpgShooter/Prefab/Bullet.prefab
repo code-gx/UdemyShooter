@@ -21,7 +21,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2764556628748219165
 Transform:
   m_ObjectHideFlags: 0
@@ -147,6 +147,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc433d5e3bf8a48429b9c586e5fed5d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rb: {fileID: 4923944784477158629}
+  meshRenderer: {fileID: 2450788781734185455}
+  boxCollider: {fileID: 6735341196223799644}
+  trailRenderer: {fileID: -8770981032870905323}
   bulletImpactFX: {fileID: 1609443351187842969, guid: a112f9c8265f7254f979e409229fee8b, type: 3}
 --- !u!96 &-8770981032870905323
 TrailRenderer:

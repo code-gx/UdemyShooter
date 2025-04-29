@@ -376,10 +376,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Bullet
       objectReference: {fileID: 0}
-    - target: {fileID: 1073982708139751261, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 2764556628748219165, guid: 0fa9c572fff5ce7408f1c2c04a1657a4, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.69
@@ -1993,6 +1989,7 @@ MonoBehaviour:
     totalReserveAmmo: 50
     reloadSpeed: 3
     equipSpeed: 3
+    gunDistance: 2
     baseSpread: 10
     maxSpread: 10
     currentSpread: 0
@@ -2001,21 +1998,22 @@ MonoBehaviour:
   weaponHolder: {fileID: 675401090}
   maxWeaponSlots: 2
   weaponSlots:
-  - weaponType: 0
+  - weaponType: 3
     shootType: 0
     fireRate: 10
-    burstModeAvailable: 0
-    burstActive: 0
+    burstModeAvailable: 1
+    burstActive: 1
     burstModeFireRate: 1
     bulletsPerShot: 5
     burstFireDely: 0
-    bulletsInMagazine: 10
-    magazineCapacity: 10
-    totalReserveAmmo: 50
+    bulletsInMagazine: 20
+    magazineCapacity: 20
+    totalReserveAmmo: 999
     reloadSpeed: 2
     equipSpeed: 2
-    baseSpread: 0
-    maxSpread: 0
+    gunDistance: 2.5
+    baseSpread: 10
+    maxSpread: 10
     currentSpread: 0
   - weaponType: 2
     shootType: 1
@@ -2030,6 +2028,7 @@ MonoBehaviour:
     totalReserveAmmo: 100
     reloadSpeed: 1
     equipSpeed: 1
+    gunDistance: 6
     baseSpread: 0
     maxSpread: 5
     currentSpread: 0
@@ -3308,10 +3307,10 @@ LineRenderer:
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 0.9056604, g: 0.18369527, b: 0.18369527, a: 0.22352941}
-      key1: {r: 1, g: 0, b: 0.14465427, a: 1}
-      key2: {r: 0.93333334, g: 0.73324126, b: 0.2078431, a: 1}
-      key3: {r: 0, g: 0, b: 0, a: 0.07017702}
+      key0: {r: 0.9056604, g: 0.18369527, b: 0.18369527, a: 1}
+      key1: {r: 1, g: 0, b: 0.14465427, a: 0.7921569}
+      key2: {r: 0.93333334, g: 0.73324126, b: 0.2078431, a: 0.7058824}
+      key3: {r: 0, g: 0, b: 0, a: 1}
       key4: {r: 0, g: 0, b: 0, a: 0.07017702}
       key5: {r: 0, g: 0, b: 0, a: 0}
       key6: {r: 0, g: 0, b: 0, a: 0}
@@ -6707,6 +6706,7 @@ MonoBehaviour:
     totalReserveAmmo: 36
     reloadSpeed: 1
     equipSpeed: 1
+    gunDistance: 2
     baseSpread: 0
     maxSpread: 2
     currentSpread: 0

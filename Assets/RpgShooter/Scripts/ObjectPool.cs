@@ -31,15 +31,17 @@ public class ObjectPool : MonoBehaviour
             CreateBullet();
         GameObject bullet = bulletPool.Dequeue();
         bullet.SetActive(true);
-        bullet.transform.SetParent(null);
+        bullet.transform.parent = null;
         return bullet;
     }
 
     public void ReturnBullet(GameObject bullet)
     {
+        print("开始返回缓存池");
         bulletPool.Enqueue(bullet);
+        Debug.Log("缓存池数量" + bulletPool.Count);
         bullet.SetActive(false);
-        bullet.transform.SetParent(transform);
+        bullet.transform.parent = transform;
     }
     private void CreateInitialPool()
     {
