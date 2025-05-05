@@ -29,7 +29,7 @@ public class PlayerWeaponVisuals : MonoBehaviour
         backupWeaponModels = GetComponentsInChildren<BackupWeaponModel>(true);
         player = GetComponent<Player>();
         //先保证currentweapon初始化完
-        Invoke("InitWeaponReloadAndEquipSpeed", 0.11f);
+        // Invoke("InitWeaponReloadAndEquipSpeed", 0.11f);
     }
 
     private void Update()
@@ -101,7 +101,7 @@ public class PlayerWeaponVisuals : MonoBehaviour
     {
         foreach (var backupWeapon in backupWeaponModels)
         {
-            backupWeapon.gameObject.SetActive(false);
+            backupWeapon.Activate(false);
         }
     }
 
@@ -109,13 +109,32 @@ public class PlayerWeaponVisuals : MonoBehaviour
     {
         if (player.weapon.isHasOnlyOneWeapon())
             return;
-        Weapon_Type backupWeaponType = player.weapon.BackupWeapon().weaponType;
-        foreach (var backupWeapon in backupWeaponModels)
+        BackupWeaponModel lowHangWeapon = null;
+        BackupWeaponModel backHangWeapon = null;
+        BackupWeaponModel sideHangWeapon = null;
+        foreach (var backupWeaponModel in backupWeaponModels)
         {
-            if(backupWeaponType == backupWeapon.weaponType)
+            if (player.weapon.CurrentWeapon().weaponType == backupWeaponModel.weaponType)
+                continue;
+            if (player.weapon.WeaponInSlots(backupWeaponModel.weaponType) != null)
             {
-                backupWeapon.gameObject.SetActive(true);
+                if (backupWeaponModel.hangType == Hang_Type.LowBackHang)
+                {
+                    lowHangWeapon = backupWeaponModel;
+                }
+                else if(backupWeaponModel.hangType == Hang_Type.BackHang)
+                {
+                    backHangWeapon = backupWeaponModel;
+                }
+                else if(backupWeaponModel.hangType == Hang_Type.SdieHang)
+                {
+                    sideHangWeapon = backupWeaponModel;
+                }
             }
+
+            lowHangWeapon ?.Activate(true);
+            backHangWeapon ?.Activate(true);
+            sideHangWeapon ?.Activate(true);
         }
     }
 

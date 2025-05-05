@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c24ef029cff8e5c4bb31dd8b5ad1236c, type: 3}
+  m_Name: Weapon_ShotGun_D
+  m_EditorClassIdentifier: 
+  bulletsInMagazine: 30
+  magazineCapacity: 30
+  totalReserveAmmo: 9999999
+  weaponName: s686
+  weaponType: 3
+  fireRate: 4
+  burstModeAvailable: 1
+  burstActive: 1
+  bulletsPerShot: 5
+  burstModeFireRate: 4
+  burstFireDely: 0
+  baseSpread: 10
+  maxSpread: 10
+  shootType: 0
+  reloadSpeed: 2
+  equipSpeed: 2
+  gunDistance: 6
+  cameraDistance: 8

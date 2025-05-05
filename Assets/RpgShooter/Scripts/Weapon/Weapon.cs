@@ -18,36 +18,71 @@ public enum Shoot_Type
 
 [System.Serializable]
 public class Weapon 
-{
+{   
+    #region Regular Info
     public Weapon_Type weaponType;
-    
-    [Header("Shooting details")]
-    [Space]
     public Shoot_Type shootType;
-    private const float defaultFireRate = 10; //默认不开三连射的射速
+    private float defaultFireRate = 10; //默认不开三连射的射速
     public float fireRate = 10; //每秒射出的子弹数
     private float lastShootTime;
-    [Header("Burst details")]
-    public bool burstModeAvailable;
+    #endregion
+
+    #region Burst Info
+    private bool burstModeAvailable;
     public bool burstActive;
-    public float burstModeFireRate;
-    public int bulletsPerShot;
-    public float burstFireDely = 0.1f;
+    private float burstModeFireRate;
+    public int bulletsPerShot{ get; private set;}
+    public float burstFireDely{ get; private set;}
+    #endregion
     [Header("Magazine details")]
     public int bulletsInMagazine;
     public int magazineCapacity;
     public int totalReserveAmmo;
-    [Range(1,3)]
-    public float reloadSpeed = 1;
-    [Range(1,3)]
-    public float equipSpeed = 1;
-    [Range(2,12)]
-    public float gunDistance;
 
-    [Header("Spread")]
-    public float baseSpread = 0;
-    public float maxSpread = 4;
-    public float currentSpread;
+    #region Weapon generic
+    public float reloadSpeed{ get; private set;}
+    public float equipSpeed{ get; private set;}
+    public float gunDistance{ get; private set;}
+    public float cameraDistance{ get; private set;}
+    #endregion
+
+    #region Spread Info
+    private float baseSpread = 0;
+    private float maxSpread = 4;
+    private float currentSpread;
+    #endregion
+
+    public Weapon_Data weaponData { get; private set; }
+
+    public Weapon(Weapon_Data weaponData)
+    {
+        this.weaponData = weaponData;
+
+        bulletsInMagazine = weaponData.bulletsInMagazine;
+        magazineCapacity = weaponData.magazineCapacity;
+        totalReserveAmmo = weaponData.totalReserveAmmo;
+
+        shootType = weaponData.shootType;
+        fireRate = weaponData.fireRate;
+        weaponType = weaponData.weaponType;
+
+        baseSpread = weaponData.baseSpread;
+        maxSpread = weaponData.maxSpread;
+
+        reloadSpeed = weaponData.reloadSpeed;
+        equipSpeed = weaponData.equipSpeed;
+        gunDistance = weaponData.gunDistance;
+        cameraDistance = weaponData.cameraDistance;
+
+        burstModeAvailable = weaponData.burstModeAvailable;
+        burstActive = weaponData.burstActive;
+        bulletsPerShot = weaponData.bulletsPerShot;
+        burstModeFireRate = weaponData.burstModeFireRate;
+        burstFireDely = weaponData.burstFireDely;
+
+        defaultFireRate = fireRate;
+    }
+
     public Vector3 ApplySpread(Vector3 originalDirection, float buttonTime)
     {
         currentSpread = getCurrentSpread(baseSpread, maxSpread, buttonTime);

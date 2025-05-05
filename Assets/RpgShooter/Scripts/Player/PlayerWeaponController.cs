@@ -1,8 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Mathematics;
-using UnityEditor.Rendering.LookDev;
 using UnityEngine;
 
 public class PlayerWeaponController : MonoBehaviour
@@ -10,6 +8,8 @@ public class PlayerWeaponController : MonoBehaviour
     private Player player;
     private bool weaponReady;
     private bool isShooting;
+
+    [SerializeField] Weapon_Data defaultWeaponData;
     
     [Header("Bullet details")]
     [SerializeField] private Weapon currentWeapon;
@@ -29,26 +29,29 @@ public class PlayerWeaponController : MonoBehaviour
     public float fireButtonTime = 0;
     public float maxButtonTime = 3.0f;  //最大后座力时间
 
+    [SerializeField] private GameObject weaponPickupPrefab;
     public Transform GunPoint() => player.weaponVisuals.CurrentWeaponModel().gunPoint;
     public Weapon CurrentWeapon() => currentWeapon;
     public bool isHasOnlyOneWeapon() => weaponSlots.Count <= 1;
-    public float getFireButtonDownTimeNormalized() => fireButtonTime / maxButtonTime;
-    public Weapon BackupWeapon()
+    public Weapon WeaponInSlots(Weapon_Type weaponType)
     {
-        foreach(var weapon in weaponSlots)
+        foreach (var weapon in weaponSlots)
         {
-            if(weapon != currentWeapon)
+            if (weapon.weaponType == weaponType)
             {
                 return weapon;
             }
         }
         return null;
     }
+    public float getFireButtonDownTimeNormalized() => fireButtonTime / maxButtonTime;
+
     private void Start()
     {
         player = GetComponent<Player>();
         AssignInputEvents();
         Invoke("EquipStartWeapon", 0.1f);
+        // EquipWeapon(0);
     }
 
     private void Update()
@@ -56,10 +59,6 @@ public class PlayerWeaponController : MonoBehaviour
         if (isShooting)
             Shoot();
         UpdateFireButtonTime();
-        if(Input.GetKeyDown(KeyCode.T))
-        {
-            currentWeapon.ToggleBurst();
-        }
     }
 
     private void UpdateFireButtonTime()
@@ -78,10 +77,8 @@ public class PlayerWeaponController : MonoBehaviour
 
     private void EquipStartWeapon()
     {
-        currentWeapon = weaponSlots[0];
-        SetWeaponReady(true);
-        player.weaponVisuals.SwitchCurrentWeaponModel();
-        player.weaponVisuals.SwitchOnBackupWeaponModels();
+        weaponSlots[0] = new Weapon(defaultWeaponData);
+        EquipWeapon(0);
     }
 
     // void OnDrawGizmos()
@@ -94,27 +91,64 @@ public class PlayerWeaponController : MonoBehaviour
     #region Slots management - Pickup\Equip\Drop\Ready Weapon
     private void EquipWeapon(int i)
     {
+        if (i >= weaponSlots.Count)
+            return;
         if(currentWeapon == weaponSlots[i])
             return;
         SetWeaponReady(false);
         //数据先动 动画播放也是前端效果 不然会出错
         currentWeapon = weaponSlots[i];
         player.weaponVisuals.PlayWeaponEquipAnimation();
+        CameraManager.instance.SetCameraDistance(currentWeapon.cameraDistance);
     }
 
     private void DropWeapon()
     {
-        if(isHasOnlyOneWeapon()) return;
+        if (isHasOnlyOneWeapon()) return;
+
+        CreateWeaponOntheGround();
+
         weaponSlots.Remove(currentWeapon);
         EquipWeapon(0);
     }
-    
-    public void PickupWeapon(Weapon newWeapon)
+
+    private void CreateWeaponOntheGround()
     {
-        if(weaponSlots.Count >= maxWeaponSlots)
+        GameObject dropWeapon = ObjectPool.instance.GetObject(weaponPickupPrefab);
+        dropWeapon.GetComponent<Pickup_Weapon>().SetupPickupWeapon(currentWeapon, transform);
+    }
+
+    public void PickupWeapon(Weapon weapon)
+    {
+        Weapon newWeapon = weapon;
+        Weapon oldWeapon = WeaponInSlots(newWeapon.weaponType);
+
+        //有枪就补充子弹
+        if (oldWeapon != null)
         {
+            currentWeapon.totalReserveAmmo += oldWeapon.totalReserveAmmo;
+            currentWeapon.bulletsInMagazine += oldWeapon.bulletsInMagazine;
+            if (currentWeapon.bulletsInMagazine > currentWeapon.magazineCapacity)
+            {
+                currentWeapon.totalReserveAmmo += currentWeapon.bulletsInMagazine - currentWeapon.bulletsInMagazine;
+                currentWeapon.bulletsInMagazine = currentWeapon.magazineCapacity;
+            }
             return;
         }
+
+        //没有对应的枪并且槽满了 换枪
+        if(weaponSlots.Count >= maxWeaponSlots && oldWeapon == null)
+        {
+            int weaponIndex = weaponSlots.IndexOf(currentWeapon);
+
+            player.weaponVisuals.SwitchOffWeaponModels();
+            weaponSlots[weaponIndex] = newWeapon;
+            CreateWeaponOntheGround();
+            EquipWeapon(weaponIndex);
+            return;
+        }
+
+        //没枪但是没满
         weaponSlots.Add(newWeapon);
         player.weaponVisuals.SwitchOnBackupWeaponModels();
     }
@@ -159,7 +193,7 @@ public class PlayerWeaponController : MonoBehaviour
     private void FireSingleBullet()
     {
         currentWeapon.bulletsInMagazine --;
-        GameObject newBullet = ObjectPool.instance.GetBullet();
+        GameObject newBullet = ObjectPool.instance.GetObject(bulletPrefab);
         // Instantiate(bulletPrefab, gunPoint.position,Quaternion.LookRotation(gunPoint.forward));
         newBullet.transform.position = GunPoint().position;
         //很关键 如果复用对象池 get对象时先active 再设置位置 会造成拖尾不正常的效果
@@ -187,7 +221,10 @@ public class PlayerWeaponController : MonoBehaviour
         controls.Character.Fire.canceled += context => isShooting = false;
         controls.Character.EquipSlot1.performed += context => EquipWeapon(0);
         controls.Character.EquipSlot2.performed += context => EquipWeapon(1);
+        controls.Character.EquipSlot3.performed += context => EquipWeapon(2);
+        controls.Character.EquipSlot4.performed += context => EquipWeapon(3);
         controls.Character.DropCurrentWeapon.performed += context => DropWeapon();
+        controls.Character.ToggleWeaponMode.performed += context => currentWeapon.ToggleBurst();
         controls.Character.Reload.performed += context => 
         {
             if (currentWeapon.CanReload()&&GetWeaponReady())

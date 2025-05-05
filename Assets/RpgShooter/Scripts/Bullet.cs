@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    [SerializeField] private Rigidbody rb;
-    [SerializeField] private MeshRenderer meshRenderer;
-    [SerializeField] private BoxCollider boxCollider;
-    [SerializeField] private TrailRenderer trailRenderer;
+    private Rigidbody rb;
+    private MeshRenderer meshRenderer;
+    private BoxCollider boxCollider;
+    private TrailRenderer trailRenderer;
     [SerializeField] private GameObject bulletImpactFX;
     private Vector3 startPosition;
     private float flyDistance;
@@ -22,28 +22,51 @@ public class Bullet : MonoBehaviour
         this.flyDistance = flyDistance;
     }
 
+    private void Awake()
+    {
+        rb = GetComponent<Rigidbody>();
+        meshRenderer = GetComponent<MeshRenderer>();
+        boxCollider = GetComponent<BoxCollider>();
+        trailRenderer = GetComponent<TrailRenderer>();
+    }
+
     private void Update()
     {
-        if(Vector3.Distance(transform.position, startPosition) >= flyDistance - 1.5)
-            trailRenderer.time -= 3 * Time.deltaTime;
-        if(Vector3.Distance(transform.position, startPosition) >= flyDistance && !bulletDisabled)
+        UpdateTrailTime();
+        CheckDisabled();
+        CheckReturnPool();
+    }
+
+    private void CheckReturnPool()
+    {
+        if (trailRenderer.time < 0)
+        {
+            ObjectPool.instance.ReturnToPool(gameObject);
+        }
+    }
+
+    private void CheckDisabled()
+    {
+        if (Vector3.Distance(transform.position, startPosition) >= flyDistance && !bulletDisabled)
         {
             // ObjectPool.instance.ReturnBullet(gameObject);
             boxCollider.enabled = false;
             meshRenderer.enabled = false;
             bulletDisabled = true;
         }
-        if(trailRenderer.time < 0)
-        {
-            ObjectPool.instance.ReturnBullet(gameObject);
-        }
     }
+
+    private void UpdateTrailTime()
+    {
+        if (Vector3.Distance(transform.position, startPosition) >= flyDistance - 1.5)
+            trailRenderer.time -= 3.5f * Time.deltaTime;
+    }
+
     private void OnCollisionEnter(Collision other)
     {
         // rb.constraints = RigidbodyConstraints.FreezeAll;
-        print("彭值11111");
         CreateImpactFx(other);
-        ObjectPool.instance.ReturnBullet(gameObject);
+        ObjectPool.instance.ReturnToPool(gameObject);
     }
 
     private void CreateImpactFx(Collision other)
@@ -51,13 +74,9 @@ public class Bullet : MonoBehaviour
         if (other.contacts.Length > 0)
         {
             var contact = other.contacts[0];
-            GameObject newImpactFx = Instantiate(bulletImpactFX, contact.point, Quaternion.LookRotation(contact.normal));
-            Destroy(newImpactFx, 1.0f);
+            GameObject newImpactFx = ObjectPool.instance.GetObject(bulletImpactFX);
+            newImpactFx.transform.position = contact.point;
+            ObjectPool.instance.DelayReturnObject(newImpactFx, 1.0f);
         }
-    }
-
-    void OnDestroy()
-    {
-        UnityEngine.Debug.Log("销毁");
     }
 }
