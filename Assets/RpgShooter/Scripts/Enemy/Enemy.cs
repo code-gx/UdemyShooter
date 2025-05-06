@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditorInternal;
@@ -6,11 +7,13 @@ using UnityEngine.AI;
 
 public class Enemy : MonoBehaviour
 {
+    public float turnSpeed;
     [Header("Idle data")]
     public float idleTime;
     [Header("Move data")]
     public float moveSpeed;
     [SerializeField] private Transform[] patrolPoints;
+    public Animator anim {get; private set;}
     private int currentPatrolIndex;
     public NavMeshAgent agent {get; private set;}
 
@@ -20,6 +23,7 @@ public class Enemy : MonoBehaviour
     {
         stateMachine = new EnemyStateMachine();
         agent = GetComponent<NavMeshAgent>();
+        anim = GetComponentInChildren<Animator>();
     }
 
     protected virtual void Start()
@@ -39,6 +43,14 @@ public class Enemy : MonoBehaviour
             currentPatrolIndex = 0;
         return destination;
     }
+
+    public Quaternion FaceTarget(Vector3 target)
+    {
+        Quaternion targetRotation = Quaternion.LookRotation(target - transform.position);
+        Vector3 currentEularAngles = transform.rotation.eulerAngles;
+        float yRotation = Mathf.LerpAngle(currentEularAngles.y, targetRotation.eulerAngles.y, turnSpeed * Time.deltaTime);
+        return Quaternion.Euler(currentEularAngles.x, yRotation, currentEularAngles.z);
+    }  
 
     private void InitializePatrolPoints()
     {

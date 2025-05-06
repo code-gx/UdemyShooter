@@ -9,12 +9,14 @@ public class IdleState_Melee : EnemyState
     {
         //可以as是因为enemyBase本身是个子类对象 
         enemy = enemyBase as Enemy_Melee;
+        
     }
 
     public override void Enter()
     {
         base.Enter();
         stateTimer = enemyBase.idleTime;
+        enemy.anim.SetBool(animBoolName, true);
     }
 
     public override void Update()
@@ -29,5 +31,6 @@ public class IdleState_Melee : EnemyState
     public override void Exit()
     {
         base.Exit();
+        enemy.anim.SetBool(animBoolName, false);
     }
 }

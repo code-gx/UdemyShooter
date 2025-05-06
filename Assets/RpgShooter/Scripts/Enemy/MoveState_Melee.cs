@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class MoveState_Melee : EnemyState
 {
@@ -15,20 +16,37 @@ public class MoveState_Melee : EnemyState
     {
         base.Enter();
         destination = enemy.GetPatrolDestination();
+        enemy.agent.SetDestination(destination);
+        enemy.anim.SetBool(animBoolName, true);
     }
 
     public override void Update()
     {
         base.Update();
-        enemy.agent.SetDestination(destination);
+        enemy.transform.rotation = enemy.FaceTarget(GetNextPathPoint());
         //remainingDistance初始化为0 计算路径需要几帧 pathPending是否正在计算路径
-        if (enemy.agent.pathPending == false && enemy.agent.remainingDistance <= 1)
+        if (enemy.agent.pathPending == false && enemy.agent.remainingDistance <= enemy.agent.stoppingDistance)
             stateMachine.ChangeState(enemy.idleState);
     }
 
     public override void Exit()
     {
         base.Exit();
-        Debug.Log("exit" + " move state");
+        enemy.anim.SetBool(animBoolName, false);
+    }
+
+    public Vector3 GetNextPathPoint()
+    {
+        NavMeshAgent agent = enemy.agent;
+        NavMeshPath path = agent.path;
+        
+        if (path.corners.Length < 2)
+            return agent.destination;
+        for (int i = 0; i < path.corners.Length; i++)
+        {
+            if (Vector3.Distance(agent.transform.position, path.corners[i]) < 1)
+                return path.corners[i + 1];
+        }
+        return agent.destination;
     }
 }
