@@ -17,13 +17,20 @@ public class MoveState_Melee : EnemyState
         base.Enter();
         destination = enemy.GetPatrolDestination();
         enemy.agent.SetDestination(destination);
-        enemy.anim.SetBool(animBoolName, true);
     }
 
     public override void Update()
     {
         base.Update();
+
+        if (enemy.PlayerInAggresionRange())
+        {
+            stateMachine.ChangeState(enemy.recoveryState);
+            return;
+        }
+
         enemy.transform.rotation = enemy.FaceTarget(GetNextPathPoint());
+        
         //remainingDistance初始化为0 计算路径需要几帧 pathPending是否正在计算路径
         if (enemy.agent.pathPending == false && enemy.agent.remainingDistance <= enemy.agent.stoppingDistance)
             stateMachine.ChangeState(enemy.idleState);
@@ -32,7 +39,7 @@ public class MoveState_Melee : EnemyState
     public override void Exit()
     {
         base.Exit();
-        enemy.anim.SetBool(animBoolName, false);
+        enemy.agent.isStopped = true;
     }
 
     public Vector3 GetNextPathPoint()

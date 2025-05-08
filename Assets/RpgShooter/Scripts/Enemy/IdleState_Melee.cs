@@ -16,21 +16,25 @@ public class IdleState_Melee : EnemyState
     {
         base.Enter();
         stateTimer = enemyBase.idleTime;
-        enemy.anim.SetBool(animBoolName, true);
     }
 
     public override void Update()
     {
         base.Update();
+        if (enemy.PlayerInAggresionRange())
+        {
+            stateMachine.ChangeState(enemy.recoveryState);
+            return;
+        }
         if (stateTimer < 0)
         {
             stateMachine.ChangeState(enemy.moveState);
+            return;
         }
     }
 
     public override void Exit()
     {
         base.Exit();
-        enemy.anim.SetBool(animBoolName, false);
     }
 }
