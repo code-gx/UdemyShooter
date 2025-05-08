@@ -1284,7 +1284,7 @@ Transform:
   m_GameObject: {fileID: 224315798}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.38, y: 0.23, z: 0.96}
+  m_LocalPosition: {x: -1.21, y: 0.23, z: 3.76}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3094,6 +3094,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 221d942ae7344d1459503796c025f155, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  turnSpeed: 5
+  aggresionRange: 5
   idleTime: 2
   moveSpeed: 0
   patrolPoints:
@@ -3109,7 +3111,7 @@ Transform:
   m_GameObject: {fileID: 690963591}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.412, y: 0, z: -0.887}
+  m_LocalPosition: {x: -6.23, y: 0, z: 1.45}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3164,7 +3166,7 @@ Transform:
   m_GameObject: {fileID: 746075581}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.87, y: 0.23, z: -1.99}
+  m_LocalPosition: {x: -8.049, y: -0, z: 0.425}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5847,7 +5849,7 @@ Transform:
   m_GameObject: {fileID: 1577496518}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 2.47, y: 0.23, z: -1.8399999}
+  m_LocalPosition: {x: 3.99, y: 0.23, z: -2.66}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -12337,6 +12339,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6459535365600141355}
   - component: {fileID: 1100230589830052433}
+  - component: {fileID: 6459535365600141356}
   m_Layer: 0
   m_Name: enemy_character_1
   m_TagString: Untagged
@@ -12694,6 +12697,18 @@ Transform:
   - {fileID: 5091916543489298493}
   m_Father: {fileID: 690963593}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6459535365600141356
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5976049778677201553}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c45112d892f04d48bf1d7006789e6bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &6502182839916087948
 Transform:
   m_ObjectHideFlags: 0
