@@ -5,14 +5,26 @@ using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.AI;
 
+[Serializable]
+public struct AttackData
+{
+    public float attackRange;
+    public float moveSpeed;
+    public float attackIndex;
+    [Range(1,2)]
+    public float animationSpeed;
+}
 public class Enemy : MonoBehaviour
 {
-    public float turnSpeed;
-    public float aggresionRange;
+
     [Header("Idle data")]
     public float idleTime;
+    public float aggresionRange;
     [Header("Move data")]
+    public float turnSpeed;
     public float moveSpeed;
+    public float chaseSpeed;
+    private bool manualMovement;
     [SerializeField] private Transform[] patrolPoints;
 
     public Transform player {get; private set;}
@@ -65,11 +77,14 @@ public class Enemy : MonoBehaviour
     }
 
     public bool PlayerInAggresionRange() => Vector3.Distance(transform.position, player.position) < aggresionRange;
-
-    private void OnDrawGizmos()
+    
+    protected virtual void OnDrawGizmos()
     {
         Gizmos.DrawWireSphere(transform.position, aggresionRange);
     }
 
-    public void AnimationTrigger() => stateMachine.currentState.AnimationTrigger();  
+    public void AnimationTrigger() => stateMachine.currentState.AnimationTrigger();
+    public void ActivateManualMovement(bool manualMovement) => this.manualMovement = manualMovement;
+    public bool getMaulMovement() => manualMovement;
+    
 }

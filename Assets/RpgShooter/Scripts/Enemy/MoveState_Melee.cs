@@ -15,8 +15,11 @@ public class MoveState_Melee : EnemyState
     public override void Enter()
     {
         base.Enter();
+
+        enemy.agent.speed = enemy.moveSpeed;
         destination = enemy.GetPatrolDestination();
         enemy.agent.SetDestination(destination);
+        enemy.agent.isStopped = false;
     }
 
     public override void Update()
@@ -40,20 +43,5 @@ public class MoveState_Melee : EnemyState
     {
         base.Exit();
         enemy.agent.isStopped = true;
-    }
-
-    public Vector3 GetNextPathPoint()
-    {
-        NavMeshAgent agent = enemy.agent;
-        NavMeshPath path = agent.path;
-        
-        if (path.corners.Length < 2)
-            return agent.destination;
-        for (int i = 0; i < path.corners.Length; i++)
-        {
-            if (Vector3.Distance(agent.transform.position, path.corners[i]) < 1)
-                return path.corners[i + 1];
-        }
-        return agent.destination;
     }
 }

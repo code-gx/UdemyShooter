@@ -28,5 +28,5 @@ MonoBehaviour:
   shootType: 0
   reloadSpeed: 3
   equipSpeed: 3
-  gunDistance: 6
+  gunDistance: 8
   cameraDistance: 8

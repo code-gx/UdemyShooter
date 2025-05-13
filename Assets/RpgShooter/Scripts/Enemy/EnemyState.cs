@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class EnemyState
 {
@@ -35,4 +36,19 @@ public class EnemyState
     }
 
     public void AnimationTrigger() => triggerCalled = true;
+
+    protected Vector3 GetNextPathPoint()
+    {
+        NavMeshAgent agent = enemyBase.agent;
+        NavMeshPath path = agent.path;
+        
+        if (path.corners.Length < 2)
+            return agent.destination;
+        for (int i = 0; i < path.corners.Length; i++)
+        {
+            if (Vector3.Distance(agent.transform.position, path.corners[i]) < 1)
+                return path.corners[i + 1];
+        }
+        return agent.destination;
+    }
 }
