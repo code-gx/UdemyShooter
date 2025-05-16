@@ -3107,7 +3107,7 @@ MonoBehaviour:
     attackRange: 1
     moveSpeed: 0
     attackIndex: 1
-    animationSpeed: 1
+    animationSpeed: 1.4
   hiddenWeapon: {fileID: 1818814858}
   pullWeapon: {fileID: 2574363899669924944}
 --- !u!4 &690963593

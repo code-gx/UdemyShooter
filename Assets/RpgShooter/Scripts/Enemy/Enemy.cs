@@ -25,14 +25,15 @@ public class Enemy : MonoBehaviour
     public float moveSpeed;
     public float chaseSpeed;
     private bool manualMovement;
+    private bool manualRotation;
     [SerializeField] private Transform[] patrolPoints;
 
-    public Transform player {get; private set;}
-    public Animator anim {get; private set;}
+    public Transform player { get; private set; }
+    public Animator anim { get; private set; }
     private int currentPatrolIndex;
-    public NavMeshAgent agent {get; private set;}
+    public NavMeshAgent agent { get; private set; }
 
-    public EnemyStateMachine stateMachine {get; private set;}
+    public EnemyStateMachine stateMachine { get; private set; }
 
     protected virtual void Awake()
     {
@@ -66,7 +67,7 @@ public class Enemy : MonoBehaviour
         Vector3 currentEularAngles = transform.rotation.eulerAngles;
         float yRotation = Mathf.LerpAngle(currentEularAngles.y, targetRotation.eulerAngles.y, turnSpeed * Time.deltaTime);
         return Quaternion.Euler(currentEularAngles.x, yRotation, currentEularAngles.z);
-    }  
+    }
 
     private void InitializePatrolPoints()
     {
@@ -77,7 +78,7 @@ public class Enemy : MonoBehaviour
     }
 
     public bool PlayerInAggresionRange() => Vector3.Distance(transform.position, player.position) < aggresionRange;
-    
+
     protected virtual void OnDrawGizmos()
     {
         Gizmos.DrawWireSphere(transform.position, aggresionRange);
@@ -85,6 +86,8 @@ public class Enemy : MonoBehaviour
 
     public void AnimationTrigger() => stateMachine.currentState.AnimationTrigger();
     public void ActivateManualMovement(bool manualMovement) => this.manualMovement = manualMovement;
-    public bool getMaulMovement() => manualMovement;
+    public void ActivateManualRotation(bool manualRotation) => this.manualRotation = manualRotation;
+    public bool getMaualMovement() => manualMovement;
+    public bool getManualRotation() => manualRotation;
     
 }

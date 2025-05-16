@@ -26,8 +26,6 @@ public class ChaseState_Melee : EnemyState
 
         if (enemy.PlayerAttackRange())
         {
-            //如果在攻击范围内 立即转身
-            enemy.transform.LookAt(GetNextPathPoint());
             enemy.stateMachine.ChangeState(enemy.attackState);
         }
         

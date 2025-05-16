@@ -31,14 +31,21 @@ public class AttackState_Melee : EnemyState
     public override void Update()
     {
         base.Update();
-        if (enemy.getMaulMovement())
-        {
-            enemy.transform.position = 
-                Vector3.MoveTowards(enemy.transform.position, attackDirection, attackMoveSpeed * Time.deltaTime);
-        }
+
+        //只有每帧的旋转 没有动画很奇怪
+        // if (enemy.getManualRotation())
+        // {
+        //     enemy.transform.rotation = enemy.FaceTarget(enemy.player.position);
+        // }
+
+        if (enemy.getMaualMovement())
+            {
+                enemy.transform.position =
+                    Vector3.MoveTowards(enemy.transform.position, attackDirection, attackMoveSpeed * Time.deltaTime);
+            }
         if (triggerCalled)
         {
-            stateMachine.ChangeState(enemy.chaseState);
+            stateMachine.ChangeState(enemy.recoveryState);
         }
     }
 
