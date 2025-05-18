@@ -5,18 +5,9 @@ using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.AI;
 
-[Serializable]
-public struct AttackData
-{
-    public float attackRange;
-    public float moveSpeed;
-    public float attackIndex;
-    [Range(1,2)]
-    public float animationSpeed;
-}
 public class Enemy : MonoBehaviour
 {
-
+    [SerializeField] protected int healthPoints = 10;
     [Header("Idle data")]
     public float idleTime;
     public float aggresionRange;
@@ -61,11 +52,11 @@ public class Enemy : MonoBehaviour
         return destination;
     }
 
-    public Quaternion FaceTarget(Vector3 target)
+    public Quaternion FaceTarget(Vector3 target, float speed = 1)
     {
         Quaternion targetRotation = Quaternion.LookRotation(target - transform.position);
         Vector3 currentEularAngles = transform.rotation.eulerAngles;
-        float yRotation = Mathf.LerpAngle(currentEularAngles.y, targetRotation.eulerAngles.y, turnSpeed * Time.deltaTime);
+        float yRotation = Mathf.LerpAngle(currentEularAngles.y, targetRotation.eulerAngles.y, turnSpeed * Time.deltaTime * speed);
         return Quaternion.Euler(currentEularAngles.x, yRotation, currentEularAngles.z);
     }
 
@@ -75,6 +66,22 @@ public class Enemy : MonoBehaviour
         {
             t.parent = null;
         }
+    }
+
+    public virtual void GetHit()
+    {
+        healthPoints--;
+    }
+
+    public virtual void HitImpact(Vector3 force, Vector3 hitPoint, Rigidbody rb)
+    {
+        StartCoroutine(HitImpactCorutine(force, hitPoint, rb));
+    }
+
+    private IEnumerator HitImpactCorutine(Vector3 force, Vector3 hitPoint, Rigidbody rb)
+    {
+        yield return new WaitForSeconds(0.1f);
+        rb.AddForceAtPosition(force, hitPoint, ForceMode.Impulse);
     }
 
     public bool PlayerInAggresionRange() => Vector3.Distance(transform.position, player.position) < aggresionRange;

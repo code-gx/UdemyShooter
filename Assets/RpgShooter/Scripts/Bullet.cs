@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
+    public float impactForce;
     private Rigidbody rb;
     private MeshRenderer meshRenderer;
     private BoxCollider boxCollider;
@@ -12,8 +13,9 @@ public class Bullet : MonoBehaviour
     private Vector3 startPosition;
     private float flyDistance;
     private bool bulletDisabled;
-    public void BulletSetup(float flyDistance)
+    public void BulletSetup(float flyDistance, float impactForce)
     {
+        this.impactForce = impactForce;
         bulletDisabled = false;
         meshRenderer.enabled = true;
         boxCollider.enabled = true;
@@ -65,6 +67,16 @@ public class Bullet : MonoBehaviour
     private void OnCollisionEnter(Collision other)
     {
         // rb.constraints = RigidbodyConstraints.FreezeAll;
+        Enemy enemy = other.gameObject.GetComponentInParent<Enemy>();
+        if (enemy != null)
+        {
+            Vector3 force = rb.velocity.normalized * impactForce;
+            var contact = other.contacts[0];
+            Rigidbody hitRigidBody = other.collider.attachedRigidbody;
+            enemy.GetHit();
+            enemy.HitImpact(force, contact.point, hitRigidBody);
+        }
+
         CreateImpactFx(other);
         ObjectPool.instance.ReturnToPool(gameObject);
     }

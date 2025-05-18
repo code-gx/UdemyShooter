@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
 
 public class RecoveryState_Melee : EnemyState
 {
@@ -12,21 +13,23 @@ public class RecoveryState_Melee : EnemyState
     public override void Enter()
     {
         base.Enter();
-        if (enemy.PlayerAttackRange())
-        {
-            enemy.anim.SetFloat("RecoveryIndex", 1);
-        }
-        else
-        {
-            enemy.anim.SetFloat("RecoveryIndex", 0);
-            Debug.Log("11111111");
-        }
+        SetNextRecoveryAndAttack();
+    }
+
+    private void SetNextRecoveryAndAttack()
+    {
+        //决定下一个recovery动画
+        int recoveryIndex = enemy.PlayerAttackRange() ? 1 : 0;
+        enemy.anim.SetFloat("RecoveryIndex", recoveryIndex);
+        //决定下一个攻击动画
+        enemy.attackData = UpdatedAttackData();
     }
 
     public override void Update()
     {
         base.Update();
-        enemy.transform.rotation = enemy.FaceTarget(enemy.player.position);
+        float rotationSpeed = enemy.anim.GetFloat("RecoveryIndex") == 1 ? 3 : 1; 
+        enemy.transform.rotation = enemy.FaceTarget(enemy.player.position,rotationSpeed);
         if (triggerCalled)
         {
             if (enemy.PlayerAttackRange())
@@ -41,5 +44,17 @@ public class RecoveryState_Melee : EnemyState
     public override void Exit()
     {
         base.Exit();
+    }
+
+    private bool PlayerClose() => Vector3.Distance(enemy.transform.position, enemy.player.position) <= 1;
+
+    private AttackData UpdatedAttackData()
+    {
+        List<AttackData> validAttacks = new List<AttackData>(enemy.attackList);
+        
+        if (PlayerClose())
+            validAttacks.RemoveAll(parameter => parameter.attackType == Attack_Type.Charge);
+        int index = Random.Range(0, validAttacks.Count);
+        return validAttacks[index];
     }
 }

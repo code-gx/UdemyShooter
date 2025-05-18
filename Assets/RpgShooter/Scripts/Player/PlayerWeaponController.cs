@@ -10,8 +10,9 @@ public class PlayerWeaponController : MonoBehaviour
     private bool isShooting;
 
     [SerializeField] Weapon_Data defaultWeaponData;
-    
+
     [Header("Bullet details")]
+    [SerializeField] private float bulletImpact = 100;
     [SerializeField] private Weapon currentWeapon;
 
     [SerializeField] private GameObject bulletPrefab;
@@ -201,7 +202,7 @@ public class PlayerWeaponController : MonoBehaviour
         newBullet.transform.rotation = Quaternion.LookRotation(GunPoint().forward);
         Vector3 bulletDirection = currentWeapon.ApplySpread(newBullet.transform.forward, getFireButtonDownTimeNormalized());
         Bullet bulletScript = newBullet.GetComponent<Bullet>();
-        bulletScript.BulletSetup(currentWeapon.gunDistance);
+        bulletScript.BulletSetup(currentWeapon.gunDistance, bulletImpact);
         
         newBullet.GetComponent<Rigidbody>().velocity = bulletDirection * bulletSpeed;
         newBullet.GetComponent<Rigidbody>().mass = REFRENCE_BULLET_SPEED / bulletSpeed;

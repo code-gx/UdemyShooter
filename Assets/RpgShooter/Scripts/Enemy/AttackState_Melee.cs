@@ -17,11 +17,12 @@ public class AttackState_Melee : EnemyState
     {
         base.Enter();
 
+        enemy.PullWeapon();
         attackMoveSpeed = enemy.attackData.moveSpeed;
         enemy.anim.SetFloat("AttackAnimationSpeed", enemy.attackData.animationSpeed);
         enemy.anim.SetFloat("AttackIndex", enemy.attackData.attackIndex);
+        enemy.anim.SetFloat("SlashAttackIndex", Random.Range(0, 4));
 
-        enemy.PullWeapon();
         enemy.agent.isStopped = true;
         enemy.agent.velocity = Vector3.zero;
 
@@ -32,7 +33,7 @@ public class AttackState_Melee : EnemyState
     {
         base.Update();
 
-        //只有每帧的旋转 没有动画很奇怪
+        // 只有每帧的旋转 没有动画很奇怪
         // if (enemy.getManualRotation())
         // {
         //     enemy.transform.rotation = enemy.FaceTarget(enemy.player.position);
