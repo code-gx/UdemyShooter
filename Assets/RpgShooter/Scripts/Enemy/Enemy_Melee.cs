@@ -9,6 +9,12 @@ public enum Attack_Type
     Charge,
 }
 
+public enum Enemy_Melee_Type
+{
+    Ruglar,
+    Shield,
+}
+
 [Serializable]
 public struct AttackData
 {
@@ -31,6 +37,10 @@ public class Enemy_Melee : Enemy
 
     public DeadState_Melee deadState{ get; private set; }
 
+    [Header("Enemy Settings")]
+    public Enemy_Melee_Type meleeType;
+    [SerializeField] private Transform shieldTransform;
+
     [Header("Attack Data")]
     public AttackData attackData;
     public List<AttackData> attackList;
@@ -52,12 +62,23 @@ public class Enemy_Melee : Enemy
     {
         base.Start();
         stateMachine.Initialize(idleState);
+
+        InitializeSpeciality();
     }
 
     protected override void Update()
     {
         base.Update();
         stateMachine.currentState.Update();
+    }
+
+    private void InitializeSpeciality()
+    {
+        if (meleeType == Enemy_Melee_Type.Shield)
+        {
+            anim.SetFloat("ChaseIndex", 1);
+            shieldTransform.gameObject.SetActive(true);
+        }
     }
 
     public override void GetHit()
