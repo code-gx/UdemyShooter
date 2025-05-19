@@ -189,6 +189,7 @@ public class PlayerWeaponController : MonoBehaviour
             return;
         }
         FireSingleBullet();
+        TriggerEnemyDodge();
     }
 
     private void FireSingleBullet()
@@ -214,6 +215,21 @@ public class PlayerWeaponController : MonoBehaviour
         player.weaponVisuals.PlayReloadAnimation();
     }
 
+    private void TriggerEnemyDodge()
+    {
+        Vector3 rayOrigin = GunPoint().position;
+        Vector3 rayDirection = GunPoint().forward;
+
+        if (Physics.Raycast(rayOrigin, rayDirection, out RaycastHit hit, Mathf.Infinity))
+        {
+            Enemy_Melee enemyMelee = hit.collider.GetComponentInParent<Enemy_Melee>();
+            if (enemyMelee != null)
+            {
+                enemyMelee.ActivateDodgeRoll();
+            } 
+        }
+    }
+
     #region Input Events
     private void AssignInputEvents()
     {
@@ -226,9 +242,9 @@ public class PlayerWeaponController : MonoBehaviour
         controls.Character.EquipSlot4.performed += context => EquipWeapon(3);
         controls.Character.DropCurrentWeapon.performed += context => DropWeapon();
         controls.Character.ToggleWeaponMode.performed += context => currentWeapon.ToggleBurst();
-        controls.Character.Reload.performed += context => 
+        controls.Character.Reload.performed += context =>
         {
-            if (currentWeapon.CanReload()&&GetWeaponReady())
+            if (currentWeapon.CanReload() && GetWeaponReady())
             {
                 Reload();
             }

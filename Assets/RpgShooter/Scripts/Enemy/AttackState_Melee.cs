@@ -34,16 +34,17 @@ public class AttackState_Melee : EnemyState
         base.Update();
 
         // 只有每帧的旋转 没有动画很奇怪
-        // if (enemy.getManualRotation())
-        // {
-        //     enemy.transform.rotation = enemy.FaceTarget(enemy.player.position);
-        // }
+        if (enemy.getManualRotation())
+        {
+            enemy.transform.rotation = enemy.FaceTarget(enemy.player.position);
+            attackDirection = enemy.transform.position + (enemy.transform.forward * MAX_ATTACK_DISTANCE);
+        }
 
         if (enemy.getMaualMovement())
-            {
-                enemy.transform.position =
-                    Vector3.MoveTowards(enemy.transform.position, attackDirection, attackMoveSpeed * Time.deltaTime);
-            }
+        {
+            enemy.transform.position =
+                Vector3.MoveTowards(enemy.transform.position, attackDirection, attackMoveSpeed * Time.deltaTime);
+        }
         if (triggerCalled)
         {
             stateMachine.ChangeState(enemy.recoveryState);

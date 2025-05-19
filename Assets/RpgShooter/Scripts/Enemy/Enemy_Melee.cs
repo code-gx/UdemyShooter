@@ -13,6 +13,7 @@ public enum Enemy_Melee_Type
 {
     Ruglar,
     Shield,
+    Dodge,
 }
 
 [Serializable]
@@ -37,9 +38,13 @@ public class Enemy_Melee : Enemy
 
     public DeadState_Melee deadState{ get; private set; }
 
+    public AbilityState_Melee abilityState;
+
     [Header("Enemy Settings")]
     public Enemy_Melee_Type meleeType;
     [SerializeField] private Transform shieldTransform;
+    public float dodgeCooldown;
+    private float lastTimeDodge;
 
     [Header("Attack Data")]
     public AttackData attackData;
@@ -56,6 +61,7 @@ public class Enemy_Melee : Enemy
         chaseState = new ChaseState_Melee(this, stateMachine, "Chase");
         attackState = new AttackState_Melee(this, stateMachine, "Attack");
         deadState = new DeadState_Melee(this, stateMachine, "Idle"); //idle是占位符 用ragdoll
+        abilityState = new AbilityState_Melee(this, stateMachine, "AxeThrow");
     }
 
     protected override void Start()
@@ -81,6 +87,12 @@ public class Enemy_Melee : Enemy
         }
     }
 
+    public void TriggerAbility()
+    {
+        abilityState.moveSpeed *= 0.6f;
+        pullWeapon.gameObject.SetActive(false);
+    }
+
     public override void GetHit()
     {
         base.GetHit();
@@ -101,5 +113,18 @@ public class Enemy_Melee : Enemy
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, attackData.attackRange);
     }
-    
+    public void ActivateDodgeRoll()
+    {
+        if (meleeType != Enemy_Melee_Type.Dodge)
+            return; 
+        if (stateMachine.currentState != chaseState)
+            return;
+        // if (Vector3.Distance(transform.position, player.position) < 1.5f)
+        //     return; 
+        if (Time.time > lastTimeDodge + dodgeCooldown)
+            {
+                lastTimeDodge = Time.time;
+                anim.SetTrigger("Dodge");
+            }
+    }
 }

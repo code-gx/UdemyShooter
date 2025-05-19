@@ -32,12 +32,13 @@ public class RecoveryState_Melee : EnemyState
         enemy.transform.rotation = enemy.FaceTarget(enemy.player.position,rotationSpeed);
         if (triggerCalled)
         {
-            if (enemy.PlayerAttackRange())
-                stateMachine.ChangeState(enemy.attackState);
-            else
-            {
-                stateMachine.ChangeState(enemy.chaseState);
-            }
+            stateMachine.ChangeState(enemy.abilityState);
+            // if (enemy.PlayerAttackRange())
+            //     stateMachine.ChangeState(enemy.attackState);
+            // else
+            // {
+            //     stateMachine.ChangeState(enemy.chaseState);
+            // }
         }
     }
 
