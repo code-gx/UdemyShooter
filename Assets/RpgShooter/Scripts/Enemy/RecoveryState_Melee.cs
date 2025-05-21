@@ -33,12 +33,14 @@ public class RecoveryState_Melee : EnemyState
         if (triggerCalled)
         {
             stateMachine.ChangeState(enemy.abilityState);
-            // if (enemy.PlayerAttackRange())
-            //     stateMachine.ChangeState(enemy.attackState);
-            // else
-            // {
-            //     stateMachine.ChangeState(enemy.chaseState);
-            // }
+            if (enemy.CanThrowAxe())
+                stateMachine.ChangeState(enemy.abilityState);
+            else if (enemy.PlayerAttackRange())
+                stateMachine.ChangeState(enemy.attackState);
+            else
+            {
+                stateMachine.ChangeState(enemy.chaseState);
+            }
         }
     }
 
@@ -47,7 +49,7 @@ public class RecoveryState_Melee : EnemyState
         base.Exit();
     }
 
-    private bool PlayerClose() => Vector3.Distance(enemy.transform.position, enemy.player.position) <= 1;
+    private bool PlayerClose() => Vector3.Distance(enemy.transform.position, enemy.player.position) <= 0.7;
 
     private AttackData UpdatedAttackData()
     {

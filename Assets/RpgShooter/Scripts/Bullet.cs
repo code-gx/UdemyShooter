@@ -97,7 +97,7 @@ public class Bullet : MonoBehaviour
             var contact = other.contacts[0];
             GameObject newImpactFx = ObjectPool.instance.GetObject(bulletImpactFX);
             newImpactFx.transform.position = contact.point;
-            ObjectPool.instance.DelayReturnObject(newImpactFx, 1.0f);
+            ObjectPool.instance.DelayReturnObject(newImpactFx, 0.8f);
         }
     }
 }

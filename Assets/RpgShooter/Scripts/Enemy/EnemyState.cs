@@ -36,12 +36,17 @@ public class EnemyState
     }
 
     public void AnimationTrigger() => triggerCalled = true;
+    
+    public virtual void TriggerAbility()
+    {
+
+    }
 
     protected Vector3 GetNextPathPoint()
     {
         NavMeshAgent agent = enemyBase.agent;
         NavMeshPath path = agent.path;
-        
+
         if (path.corners.Length < 2)
             return agent.destination;
         for (int i = 0; i < path.corners.Length; i++)

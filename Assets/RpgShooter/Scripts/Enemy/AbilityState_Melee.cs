@@ -16,6 +16,7 @@ public class AbilityState_Melee : EnemyState
     public override void Enter()
     {
         base.Enter();
+        enemy.PullWeapon();
         moveSpeed = enemy.moveSpeed;
         moveDirection = enemy.transform.position + (enemy.transform.forward * MAX_MOVE_DISTANCE);
     }
@@ -35,12 +36,20 @@ public class AbilityState_Melee : EnemyState
         }
         if (triggerCalled)
         {
-            stateMachine.ChangeState(enemy.recoveryState);
+            stateMachine.ChangeState(enemy.chaseState);
         }
     }
 
     public override void Exit()
     {
         base.Exit();
+    }
+
+    public override void TriggerAbility()
+    {
+        base.TriggerAbility();
+        GameObject newAxe = ObjectPool.instance.GetObject(enemy.axePrefab);
+        newAxe.transform.position = enemy.axeStartPoint.position;
+        newAxe.GetComponent<EnemyAxe>().AxeSetup(enemy.axeFlySpeed, enemy.player, enemy.aimTimer);
     }
 }

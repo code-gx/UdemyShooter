@@ -1834,6 +1834,37 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 39c67a80019aeb84da2c2ac42e1349f8, type: 3}
+--- !u!1 &356193676
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 356193677}
+  m_Layer: 11
+  m_Name: AxeStartPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &356193677
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 356193676}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.077, z: 0.34}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 690963593}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &432342498 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2703702003182223523, guid: e617c0d5cd6b2cc45b8fba5307df193b, type: 3}
@@ -3098,7 +3129,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   healthPoints: 10
   idleTime: 2
-  aggresionRange: 5
+  aggresionRange: 4
   turnSpeed: 5
   moveSpeed: 1.5
   chaseSpeed: 4
@@ -3109,6 +3140,11 @@ MonoBehaviour:
   meleeType: 2
   shieldTransform: {fileID: 2410280390677127379}
   dodgeCooldown: 3
+  axePrefab: {fileID: 4909129823350702195, guid: 376153fbd62e77c40891f67fc39ff3cb, type: 3}
+  axeFlySpeed: 6
+  aimTimer: 0.9
+  axeThrowCoolDown: 0
+  axeStartPoint: {fileID: 356193677}
   attackData:
     AttackName: 
     attackRange: 1
@@ -3146,6 +3182,7 @@ Transform:
   m_Children:
   - {fileID: 6459535365600141355}
   - {fileID: 290688176}
+  - {fileID: 356193677}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!195 &690963594

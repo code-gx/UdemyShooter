@@ -22,6 +22,8 @@ public class Enemy : MonoBehaviour
     public Transform player { get; private set; }
     public Animator anim { get; private set; }
     private int currentPatrolIndex;
+
+    public bool inBattleMode { get; private set; }
     public NavMeshAgent agent { get; private set; }
 
     public EnemyStateMachine stateMachine { get; private set; }
@@ -37,6 +39,7 @@ public class Enemy : MonoBehaviour
     protected virtual void Start()
     {
         InitializePatrolPoints();
+        inBattleMode = false;
     }
 
     protected virtual void Update()
@@ -68,8 +71,25 @@ public class Enemy : MonoBehaviour
         }
     }
 
+    public bool CanEnterBattleMode()
+    {
+        bool inAggresionRange = Vector3.Distance(transform.position, player.position) < aggresionRange;
+        if (inAggresionRange && !inBattleMode)
+        {
+            EnterBattleMode();
+            return true;
+        }
+        return false;
+    }
+
+    public virtual void EnterBattleMode()
+    {
+        inBattleMode = true;
+    }
+
     public virtual void GetHit()
     {
+        EnterBattleMode();
         healthPoints--;
     }
 
@@ -84,14 +104,16 @@ public class Enemy : MonoBehaviour
         rb.AddForceAtPosition(force, hitPoint, ForceMode.Impulse);
     }
 
-    public bool PlayerInAggresionRange() => Vector3.Distance(transform.position, player.position) < aggresionRange;
-
     protected virtual void OnDrawGizmos()
     {
         Gizmos.DrawWireSphere(transform.position, aggresionRange);
     }
 
     public void AnimationTrigger() => stateMachine.currentState.AnimationTrigger();
+    public virtual void TriggerAbility()
+    {
+        stateMachine.currentState.TriggerAbility();
+    }
     public void ActivateManualMovement(bool manualMovement) => this.manualMovement = manualMovement;
     public void ActivateManualRotation(bool manualRotation) => this.manualRotation = manualRotation;
     public bool getMaualMovement() => manualMovement;

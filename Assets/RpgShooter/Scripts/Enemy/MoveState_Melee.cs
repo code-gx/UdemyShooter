@@ -26,12 +26,6 @@ public class MoveState_Melee : EnemyState
     {
         base.Update();
 
-        if (enemy.PlayerInAggresionRange())
-        {
-            stateMachine.ChangeState(enemy.recoveryState);
-            return;
-        }
-
         enemy.transform.rotation = enemy.FaceTarget(GetNextPathPoint());
         
         //remainingDistance初始化为0 计算路径需要几帧 pathPending是否正在计算路径
