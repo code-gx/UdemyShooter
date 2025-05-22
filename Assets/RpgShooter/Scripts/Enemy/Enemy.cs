@@ -21,12 +21,16 @@ public class Enemy : MonoBehaviour
 
     public Transform player { get; private set; }
     public Animator anim { get; private set; }
+    private Vector3[] patrolPointsPosition;
     private int currentPatrolIndex;
 
     public bool inBattleMode { get; private set; }
     public NavMeshAgent agent { get; private set; }
 
     public EnemyStateMachine stateMachine { get; private set; }
+
+    public bool getMaualMovement() => manualMovement;
+    public bool getManualRotation() => manualRotation;
 
     protected virtual void Awake()
     {
@@ -47,29 +51,33 @@ public class Enemy : MonoBehaviour
 
     }
 
-    public Vector3 GetPatrolDestination()
-    {
-        Vector3 destination = patrolPoints[currentPatrolIndex++].position;
-        if (currentPatrolIndex >= patrolPoints.Length)
-            currentPatrolIndex = 0;
-        return destination;
-    }
-
-    public Quaternion FaceTarget(Vector3 target, float speed = 1)
+    public void FaceTarget(Vector3 target, float speed = 1)
     {
         Quaternion targetRotation = Quaternion.LookRotation(target - transform.position);
         Vector3 currentEularAngles = transform.rotation.eulerAngles;
         float yRotation = Mathf.LerpAngle(currentEularAngles.y, targetRotation.eulerAngles.y, turnSpeed * Time.deltaTime * speed);
-        return Quaternion.Euler(currentEularAngles.x, yRotation, currentEularAngles.z);
+        transform.rotation = Quaternion.Euler(currentEularAngles.x, yRotation, currentEularAngles.z);
     }
 
+    #region Patrol logic
     private void InitializePatrolPoints()
     {
-        foreach (Transform t in patrolPoints)
+        patrolPointsPosition = new Vector3[patrolPoints.Length];
+        for (int i = 0; i < patrolPointsPosition.Length; i++)
         {
-            t.parent = null;
+            patrolPointsPosition[i] = patrolPoints[i].position;
+            patrolPoints[i].gameObject.SetActive(false);
         }
     }
+
+    public Vector3 GetPatrolDestination()
+    {
+        Vector3 destination = patrolPointsPosition[currentPatrolIndex++];
+        if (currentPatrolIndex >= patrolPoints.Length)
+            currentPatrolIndex = 0;
+        return destination;
+    }
+    #endregion
 
     public bool CanEnterBattleMode()
     {
@@ -93,22 +101,18 @@ public class Enemy : MonoBehaviour
         healthPoints--;
     }
 
-    public virtual void HitImpact(Vector3 force, Vector3 hitPoint, Rigidbody rb)
+    public virtual void DeathImpact(Vector3 force, Vector3 hitPoint, Rigidbody rb)
     {
-        StartCoroutine(HitImpactCorutine(force, hitPoint, rb));
+        StartCoroutine(DeathImpactCorutine(force, hitPoint, rb));
     }
 
-    private IEnumerator HitImpactCorutine(Vector3 force, Vector3 hitPoint, Rigidbody rb)
+    private IEnumerator DeathImpactCorutine(Vector3 force, Vector3 hitPoint, Rigidbody rb)
     {
         yield return new WaitForSeconds(0.1f);
         rb.AddForceAtPosition(force, hitPoint, ForceMode.Impulse);
     }
 
-    protected virtual void OnDrawGizmos()
-    {
-        Gizmos.DrawWireSphere(transform.position, aggresionRange);
-    }
-
+    #region animation Events
     public void AnimationTrigger() => stateMachine.currentState.AnimationTrigger();
     public virtual void TriggerAbility()
     {
@@ -116,7 +120,11 @@ public class Enemy : MonoBehaviour
     }
     public void ActivateManualMovement(bool manualMovement) => this.manualMovement = manualMovement;
     public void ActivateManualRotation(bool manualRotation) => this.manualRotation = manualRotation;
-    public bool getMaualMovement() => manualMovement;
-    public bool getManualRotation() => manualRotation;
+    #endregion 
+    
+    protected virtual void OnDrawGizmos()
+    {
+        Gizmos.DrawWireSphere(transform.position, aggresionRange);
+    }
     
 }
