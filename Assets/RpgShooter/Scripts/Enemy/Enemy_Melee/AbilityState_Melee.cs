@@ -16,7 +16,7 @@ public class AbilityState_Melee : EnemyState
     public override void Enter()
     {
         base.Enter();
-        enemy.PullWeapon();
+        enemy.EnableWeaponModel(true);
         moveSpeed = enemy.moveSpeed;
         moveDirection = enemy.transform.position + (enemy.transform.forward * MAX_MOVE_DISTANCE);
     }
@@ -31,8 +31,11 @@ public class AbilityState_Melee : EnemyState
         }
         if (enemy.getMaualMovement())
         {
-            enemy.transform.position =
+            if (!enemy.PlayerAttackRange())
+            {
+                enemy.transform.position =
                 Vector3.MoveTowards(enemy.transform.position, moveDirection, moveSpeed * Time.deltaTime);
+            }
         }
         if (triggerCalled)
         {

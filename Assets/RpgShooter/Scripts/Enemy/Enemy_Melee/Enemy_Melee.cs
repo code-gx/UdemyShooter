@@ -38,8 +38,11 @@ public class Enemy_Melee : Enemy
     public ChaseState_Melee chaseState { get; private set; }
     public AttackState_Melee attackState { get; private set; }
     public DeadState_Melee deadState { get; private set; }
-    public AbilityState_Melee abilityState;
+    public AbilityState_Melee abilityState  { get; private set; }
     #endregion
+
+    [Header("Enemy Visual")]
+    private Enemy_Visuals enemyVisual;
 
     [Header("Enemy Settings")]
     public Enemy_Melee_Type meleeType;
@@ -59,8 +62,6 @@ public class Enemy_Melee : Enemy
     [Header("Attack Data")]
     public AttackData attackData;
     public List<AttackData> attackList;
-    [SerializeField] private Transform hiddenWeapon;
-    [SerializeField] private Transform pullWeapon;
 
     protected override void Awake()
     {
@@ -72,6 +73,7 @@ public class Enemy_Melee : Enemy
         attackState = new AttackState_Melee(this, stateMachine, "Attack");
         deadState = new DeadState_Melee(this, stateMachine, "Idle"); //idle是占位符 用ragdoll
         abilityState = new AbilityState_Melee(this, stateMachine, "AxeThrow");
+        enemyVisual = GetComponent<Enemy_Visuals>();
     }
 
     protected override void Start()
@@ -101,12 +103,19 @@ public class Enemy_Melee : Enemy
         stateMachine.ChangeState(recoveryState);
     }
 
+    //保证在Enemy_Visuals的初始化之前
     private void InitializeSpeciality()
     {
+        if (meleeType == Enemy_Melee_Type.AxeThrow)
+        {
+            enemyVisual.setWeaponModelType(EnemyMelee_WeaponModel_Type.Throw);
+        }
+
         if (meleeType == Enemy_Melee_Type.Shield)
         {
             anim.SetFloat("ChaseIndex", 1);
             shieldTransform.gameObject.SetActive(true);
+            enemyVisual.setWeaponModelType(EnemyMelee_WeaponModel_Type.OneHand);
         }
     }
 
@@ -114,7 +123,7 @@ public class Enemy_Melee : Enemy
     {
         base.TriggerAbility();
         abilityState.moveSpeed *= 0.6f;
-        pullWeapon.gameObject.SetActive(false);
+        EnableWeaponModel(false);
     }
 
     public override void GetHit()
@@ -124,10 +133,9 @@ public class Enemy_Melee : Enemy
             stateMachine.ChangeState(deadState);
     }
 
-    public void PullWeapon()
+    public void EnableWeaponModel(bool active)
     {
-        hiddenWeapon.gameObject.SetActive(false);
-        pullWeapon.gameObject.SetActive(true);
+        enemyVisual.currentWeaponModel.SetActive(active);
     }
     public bool PlayerAttackRange() => Vector3.Distance(transform.position, player.position) < attackData.attackRange;
 
