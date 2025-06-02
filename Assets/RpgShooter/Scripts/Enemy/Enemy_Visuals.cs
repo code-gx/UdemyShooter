@@ -7,6 +7,7 @@ public enum EnemyMelee_WeaponModel_Type
     OneHand,
     // TwoHand,
     Throw,
+    Unarmed,
 }
 
 public class Enemy_Visuals : MonoBehaviour
@@ -33,8 +34,14 @@ public class Enemy_Visuals : MonoBehaviour
     private void Start()
     {
         SetupRandomColor();
-        SetupRandomWeaponModel();
         SetupRandomCorruption();
+        if (GetComponent<Enemy_Melee>() != null)
+            SetupRandomWeaponModel();
+    }
+
+    public void EnabelWeaponTrail(bool enable)
+    {
+        currentWeaponModel.GetComponent<Enemy_WeaponModel>().EnableTrailEffect(enable);
     }
 
     public void setWeaponModelType(EnemyMelee_WeaponModel_Type type = EnemyMelee_WeaponModel_Type.OneHand)
@@ -70,6 +77,17 @@ public class Enemy_Visuals : MonoBehaviour
         int index = Random.Range(0, filterModels.Count);
         currentWeaponModel = filterModels[index].gameObject;
         currentWeaponModel.SetActive(true);
+        OverrideAnimationController();
+    }
+
+    private void OverrideAnimationController()
+    {
+        AnimatorOverrideController overrideController =
+                    currentWeaponModel.GetComponent<Enemy_WeaponModel>().overrideController;
+        if (overrideController != null)
+        {
+            GetComponentInChildren<Animator>().runtimeAnimatorController = overrideController;
+        }
     }
 
     private void SetupRandomCorruption()

@@ -30,7 +30,6 @@ public class RecoveryState_Melee : EnemyState
         enemy.FaceTarget(enemy.player.position,rotationSpeed);
         if (triggerCalled)
         {
-            stateMachine.ChangeState(enemy.abilityState);
             if (enemy.CanThrowAxe())
                 stateMachine.ChangeState(enemy.abilityState);
             else if (enemy.PlayerAttackRange())

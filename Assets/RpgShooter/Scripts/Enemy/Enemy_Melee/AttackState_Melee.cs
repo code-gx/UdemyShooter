@@ -16,8 +16,11 @@ public class AttackState_Melee : EnemyState
     public override void Enter()
     {
         base.Enter();
+        enemy.UpdateAttackData();
+
+        enemy.enemyVisual.EnabelWeaponTrail(true);
         //决定下一个攻击动画
-        enemy.attackData = UpdatedAttackData();
+        enemy.attackData = UpdatedEnemy_MeleeAttackData();
 
         enemy.EnableWeaponModel(true);
         attackMoveSpeed = enemy.attackData.moveSpeed;
@@ -49,7 +52,9 @@ public class AttackState_Melee : EnemyState
         }
         if (triggerCalled)
         {
-            if (enemy.PlayerAttackRange())
+            if (enemy.CanThrowAxe())
+                stateMachine.ChangeState(enemy.abilityState);
+            else if (enemy.PlayerAttackRange())
                 stateMachine.ChangeState(enemy.recoveryState);
             else
                 stateMachine.ChangeState(enemy.chaseState);
@@ -59,12 +64,13 @@ public class AttackState_Melee : EnemyState
     public override void Exit()
     {
         base.Exit();
+        enemy.enemyVisual.EnabelWeaponTrail(false);
     }
 
     private bool PlayerClose() => Vector3.Distance(enemy.transform.position, enemy.player.position) <= 0.7;
-    private AttackData UpdatedAttackData()
+    private AttackData_Enemy_Melee UpdatedEnemy_MeleeAttackData()
     {
-        List<AttackData> validAttacks = new List<AttackData>(enemy.attackList);
+        List<AttackData_Enemy_Melee> validAttacks = new List<AttackData_Enemy_Melee>(enemy.attackList);
 
         if (PlayerClose())
             validAttacks.RemoveAll(parameter => parameter.attackType == Attack_Type.Charge);

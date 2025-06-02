@@ -18,7 +18,7 @@ public enum Enemy_Melee_Type
 }
 
 [Serializable]
-public struct AttackData
+public struct AttackData_Enemy_Melee
 {
     public string AttackName;
     public float attackRange;
@@ -38,11 +38,10 @@ public class Enemy_Melee : Enemy
     public ChaseState_Melee chaseState { get; private set; }
     public AttackState_Melee attackState { get; private set; }
     public DeadState_Melee deadState { get; private set; }
-    public AbilityState_Melee abilityState  { get; private set; }
+    public AbilityState_Melee abilityState { get; private set; }
     #endregion
 
-    [Header("Enemy Visual")]
-    private Enemy_Visuals enemyVisual;
+    public Enemy_Visuals enemyVisual { get; private set; }
 
     [Header("Enemy Settings")]
     public Enemy_Melee_Type meleeType;
@@ -60,8 +59,8 @@ public class Enemy_Melee : Enemy
     public Transform axeStartPoint;
 
     [Header("Attack Data")]
-    public AttackData attackData;
-    public List<AttackData> attackList;
+    public AttackData_Enemy_Melee attackData;
+    public List<AttackData_Enemy_Melee> attackList;
 
     protected override void Awake()
     {
@@ -82,17 +81,13 @@ public class Enemy_Melee : Enemy
         stateMachine.Initialize(idleState);
 
         InitializeSpeciality();
+        UpdateAttackData();
     }
 
     protected override void Update()
     {
         base.Update();
         stateMachine.currentState.Update();
-
-        if (CanEnterBattleMode())
-        {
-            EnterBattleMode();
-        }
     }
 
     public override void EnterBattleMode()
@@ -117,6 +112,11 @@ public class Enemy_Melee : Enemy
             shieldTransform.gameObject.SetActive(true);
             enemyVisual.setWeaponModelType(EnemyMelee_WeaponModel_Type.OneHand);
         }
+
+        if (meleeType == Enemy_Melee_Type.Dodge)
+        {
+            enemyVisual.setWeaponModelType(EnemyMelee_WeaponModel_Type.Unarmed);
+        }
     }
 
     public override void TriggerAbility()
@@ -124,6 +124,16 @@ public class Enemy_Melee : Enemy
         base.TriggerAbility();
         abilityState.moveSpeed *= 0.6f;
         EnableWeaponModel(false);
+    }
+
+    public void UpdateAttackData()
+    {
+        if (attackList.Count != 0) return;
+        GameObject currentWeapon = enemyVisual.currentWeaponModel;
+        if (currentWeapon != null && currentWeapon.GetComponent<Enemy_WeaponModel>().weaponData != null)
+        {
+            attackList = new List<AttackData_Enemy_Melee>(currentWeapon.GetComponent<Enemy_WeaponModel>().weaponData.attackData);
+        }
     }
 
     public override void GetHit()
@@ -137,14 +147,7 @@ public class Enemy_Melee : Enemy
     {
         enemyVisual.currentWeaponModel.SetActive(active);
     }
-    public bool PlayerAttackRange() => Vector3.Distance(transform.position, player.position) < attackData.attackRange;
 
-    protected override void OnDrawGizmos()
-    {
-        base.OnDrawGizmos();
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, attackData.attackRange);
-    }
     public void ActivateDodgeRoll()
     {
         if (meleeType != Enemy_Melee_Type.Dodge)
@@ -153,12 +156,7 @@ public class Enemy_Melee : Enemy
             return;
         if (Vector3.Distance(transform.position, player.position) < 1.5f)
             return;
-        float dodgeDuration = GetAnimationClipDuration("DodgeRoll");
-        if (Time.time > lastTimeDodge + dodgeCooldown + dodgeDuration)
-        {
-            lastTimeDodge = Time.time;
-            anim.SetTrigger("Dodge");
-        }
+        ResetCoolDown();
     }
 
     public bool CanThrowAxe()
@@ -171,6 +169,15 @@ public class Enemy_Melee : Enemy
         return true;
     }
 
+    private void ResetCoolDown()
+    {
+        float dodgeDuration = GetAnimationClipDuration("DodgeRoll");
+        if (Time.time > lastTimeDodge + dodgeCooldown + dodgeDuration)
+        {
+            lastTimeDodge = Time.time;
+            anim.SetTrigger("Dodge");
+        }
+    }
     private float GetAnimationClipDuration(string clipName)
     {
         AnimationClip[] clips = anim.runtimeAnimatorController.animationClips;
@@ -184,5 +191,13 @@ public class Enemy_Melee : Enemy
         }
         Debug.Log("No such" + clipName + " animation");
         return 0;
+    }
+    
+    public bool PlayerAttackRange() => Vector3.Distance(transform.position, player.position) < attackData.attackRange;
+    protected override void OnDrawGizmos()
+    {
+        base.OnDrawGizmos();
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, attackData.attackRange);
     }
 }

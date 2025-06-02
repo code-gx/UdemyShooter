@@ -48,7 +48,10 @@ public class Enemy : MonoBehaviour
 
     protected virtual void Update()
     {
-
+        if (CanEnterBattleMode())
+        {
+            EnterBattleMode();
+        }
     }
 
     public void FaceTarget(Vector3 target, float speed = 1)
