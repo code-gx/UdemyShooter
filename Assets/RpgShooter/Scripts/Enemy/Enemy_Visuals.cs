@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 
 public enum EnemyMelee_WeaponModel_Type
 {
@@ -10,43 +11,41 @@ public enum EnemyMelee_WeaponModel_Type
     Unarmed,
 }
 
+public enum EnemyRange_WeaponModel_Type
+{
+    Pistol,
+    Revolver,
+    Shotgun,
+    AutoRifle,
+    Rifle,
+}
+
 public class Enemy_Visuals : MonoBehaviour
 {
     [Header("Corruption Visual")]
     [SerializeField] private Enemy_CorruptionCrystal[] corruptionCrystals;
     [SerializeField] private int corruptionAmount;
-
-    [Header("Weapon Visual")]
-    [SerializeField] private Enemy_WeaponModel[] weaponModels;
-    [SerializeField] private EnemyMelee_WeaponModel_Type weaponType;
-    public GameObject currentWeaponModel { get; private set; }
+    public GameObject currentWeaponModel;
 
     [Header("Color")]
     [SerializeField] private Texture[] colorTextures;
     [SerializeField] private SkinnedMeshRenderer skinnedMeshRenderer;
 
-    private void Awake()
-    {
-        weaponModels = GetComponentsInChildren<Enemy_WeaponModel>(true);
-        corruptionCrystals = GetComponentsInChildren<Enemy_CorruptionCrystal>(true);
-    }
+    [Header("Rig reference")]
+    [SerializeField] private Transform leftHandIK;
+    [SerializeField] private Transform leftElbowIK;
+    [SerializeField] private Rig rig;
 
     private void Start()
     {
         SetupRandomColor();
         SetupRandomCorruption();
-        if (GetComponent<Enemy_Melee>() != null)
-            SetupRandomWeaponModel();
+        SetupRandomWeaponModel();
     }
 
     public void EnabelWeaponTrail(bool enable)
     {
         currentWeaponModel.GetComponent<Enemy_WeaponModel>().EnableTrailEffect(enable);
-    }
-
-    public void setWeaponModelType(EnemyMelee_WeaponModel_Type type = EnemyMelee_WeaponModel_Type.OneHand)
-    {
-        weaponType = type;
     }
 
     private void SetupRandomColor()
@@ -59,40 +58,26 @@ public class Enemy_Visuals : MonoBehaviour
 
     private void SetupRandomWeaponModel()
     {
-        foreach (var weaponModel in weaponModels)
-        {
-            weaponModel.gameObject.SetActive(false);
+        bool thisEnemyIsMelee = GetComponent<Enemy_Melee>() != null;
+        bool thisEnemyIsRange = GetComponent<Enemy_Range>() != null;
+
+        if (thisEnemyIsRange)
+        { 
+            currentWeaponModel = FindeRangeWeaponModel();
+            GetComponent<Enemy_Range>().gunPoint =
+                currentWeaponModel.GetComponent<Enemy_RangeWeaponModel>().gunPoint;
         }
 
-        List<Enemy_WeaponModel> filterModels = new List<Enemy_WeaponModel>();
-
-        foreach (var weaponModel in weaponModels)
-        {
-            if (weaponType == weaponModel.weaponType)
-            {
-                filterModels.Add(weaponModel);
-            }
-        }
-
-        int index = Random.Range(0, filterModels.Count);
-        currentWeaponModel = filterModels[index].gameObject;
+        if (thisEnemyIsMelee)
+            currentWeaponModel = FindMeleeWeaponModel();
         currentWeaponModel.SetActive(true);
         OverrideAnimationController();
-    }
-
-    private void OverrideAnimationController()
-    {
-        AnimatorOverrideController overrideController =
-                    currentWeaponModel.GetComponent<Enemy_WeaponModel>().overrideController;
-        if (overrideController != null)
-        {
-            GetComponentInChildren<Animator>().runtimeAnimatorController = overrideController;
-        }
     }
 
     private void SetupRandomCorruption()
     {
         List<int> avalibleIndexs = new List<int>();
+        corruptionCrystals = GetComponentsInChildren<Enemy_CorruptionCrystal>(true);
         for (int i = 0; i < corruptionCrystals.Length; i++)
         {
             avalibleIndexs.Add(i);
@@ -107,5 +92,81 @@ public class Enemy_Visuals : MonoBehaviour
             corruptionCrystals[objectIndex].gameObject.SetActive(true);
             avalibleIndexs.RemoveAt(randomIndex);
         }
+    }
+
+    private GameObject FindMeleeWeaponModel()
+    {
+        Enemy_WeaponModel[] weaponModels = GetComponentsInChildren<Enemy_WeaponModel>(true);
+        List<Enemy_WeaponModel> filterModels = new List<Enemy_WeaponModel>();
+
+        EnemyMelee_WeaponModel_Type weaponType = GetComponent<Enemy_Melee>().weaponType;
+
+        foreach (var weaponModel in weaponModels)
+        {
+            if (weaponType == weaponModel.weaponType)
+            {
+                filterModels.Add(weaponModel);
+            }
+        }
+
+        int index = Random.Range(0, filterModels.Count);
+        return filterModels[index].gameObject;
+    }
+
+    private GameObject FindeRangeWeaponModel()
+    {
+        Enemy_RangeWeaponModel[] weaponModels = GetComponentsInChildren<Enemy_RangeWeaponModel>(true);
+        EnemyRange_WeaponModel_Type weaponType = GetComponent<Enemy_Range>().weaponType;
+
+        foreach (var weaponModel in weaponModels)
+        {
+            if (weaponType == weaponModel.weaponType)
+            {
+                SwitchAnimationLayer((int)weaponModel.weaponHoldType);
+                SetupLeftHandIK(weaponModel.leftHandIK, weaponModel.leftElbowIK);
+                return weaponModel.gameObject;
+            }
+        }
+        Debug.Log("未找到远程武器");
+        return null;
+    }
+
+    private void OverrideAnimationController()
+    {
+        AnimatorOverrideController overrideController =
+                    currentWeaponModel.GetComponent<Enemy_WeaponModel>()?.overrideController;
+        if (overrideController != null)
+        {
+            GetComponentInChildren<Animator>().runtimeAnimatorController = overrideController;
+        }
+    }
+    private void SwitchAnimationLayer(int layerIndex)
+    {
+        Animator anim = GetComponentInChildren<Animator>();
+        for (int i = 1; i < anim.layerCount; i++)
+        {
+            if (i == layerIndex)
+            {
+                anim.SetLayerWeight(i, 1);
+            }
+            else
+            {
+                anim.SetLayerWeight(i, 0);
+            }
+        }
+    }
+
+    public void EnableIK(bool enable)
+    {
+        rig.weight = enable ? 1 : 0;
+    }
+
+    private void SetupLeftHandIK(Transform leftHand, Transform leftElbow)
+    {
+        leftHandIK.localPosition = leftHand.localPosition;
+        leftHandIK.localRotation = leftHand.localRotation;
+
+        leftElbowIK.localPosition = leftElbow.localPosition;
+        leftElbowIK.localRotation = leftElbow.localRotation;
     }
 }

@@ -4,16 +4,17 @@ using UnityEngine;
 
 public class Enemy_Range : Enemy
 {
-    public Transform weaponHolder;
+    [Header("Weapon details")]
+    public EnemyRange_WeaponModel_Type weaponType;
+    public Enemy_RangeWeaponData weaponData;
+    [SerializeField] List<Enemy_RangeWeaponData> avaliableWeaponData;
 
-    public float fireRate = 1; //每s射的子弹数量
-    public GameObject bulletPrefab;
+    [Space]
+    public Transform weaponHolder;
     public Transform gunPoint;
-    public float bulletSpeed;
+    public GameObject bulletPrefab;
     private const float REFRENCE_BULLET_SPEED = 20;
-    public int bulletsToShot = 5;
-    public float weaponCooldown = 1.5f;
-    
+
     public IdleState_Range idleState { get; private set; }
     public MoveState_Range moveState { get; private set; }
     public BattleState_Range battleState { get; private set; }
@@ -30,6 +31,7 @@ public class Enemy_Range : Enemy
         base.Start();
 
         stateMachine.Initialize(idleState);
+        SetupWeapon();
     }
 
     protected override void Update()
@@ -45,11 +47,11 @@ public class Enemy_Range : Enemy
         GameObject newBullet = ObjectPool.instance.GetObject(bulletPrefab);
         newBullet.transform.position = gunPoint.position;
         newBullet.GetComponent<TrailRenderer>().Clear();
-        newBullet.transform.rotation = Quaternion.LookRotation(bulletDirection);
+        newBullet.transform.rotation = Quaternion.LookRotation(gunPoint.forward);
         newBullet.GetComponent<Enemy_Bullet>().BulletSetup();
 
-        newBullet.GetComponent<Rigidbody>().velocity = bulletDirection * bulletSpeed;
-        newBullet.GetComponent<Rigidbody>().mass = REFRENCE_BULLET_SPEED / bulletSpeed;
+        newBullet.GetComponent<Rigidbody>().velocity = weaponData.ApplySpread(bulletDirection) * weaponData.bulletSpeed;
+        newBullet.GetComponent<Rigidbody>().mass = REFRENCE_BULLET_SPEED / weaponData.bulletSpeed;
     }
 
     public override void EnterBattleMode()
@@ -58,5 +60,25 @@ public class Enemy_Range : Enemy
             return;
         base.EnterBattleMode();
         stateMachine.ChangeState(battleState);
+    }
+
+    public void SetupWeapon()
+    {
+        List<Enemy_RangeWeaponData> filterList = new List<Enemy_RangeWeaponData>();
+        foreach (var weapondata in avaliableWeaponData)
+        {
+            if (weapondata.weaponType == weaponType)
+            {
+                filterList.Add(weapondata);
+            }
+        }
+
+        if (filterList.Count > 0)
+        {
+            int index = Random.Range(0, filterList.Count);
+            weaponData = filterList[index];
+        }
+        else
+            Debug.LogWarning("没有武器数据");
     }
 }

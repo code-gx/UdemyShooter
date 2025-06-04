@@ -28,6 +28,7 @@ public class Enemy : MonoBehaviour
     public NavMeshAgent agent { get; private set; }
 
     public EnemyStateMachine stateMachine { get; private set; }
+    public Enemy_Visuals enemyVisual { get; private set; }
 
     public bool getMaualMovement() => manualMovement;
     public bool getManualRotation() => manualRotation;
@@ -37,6 +38,7 @@ public class Enemy : MonoBehaviour
         stateMachine = new EnemyStateMachine();
         agent = GetComponent<NavMeshAgent>();
         anim = GetComponentInChildren<Animator>();
+        enemyVisual = GetComponent<Enemy_Visuals>();
         player = GameObject.Find("Player").GetComponent<Transform>();
     }
 

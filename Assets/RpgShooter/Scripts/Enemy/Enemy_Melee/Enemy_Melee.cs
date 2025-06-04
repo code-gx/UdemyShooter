@@ -41,10 +41,10 @@ public class Enemy_Melee : Enemy
     public AbilityState_Melee abilityState { get; private set; }
     #endregion
 
-    public Enemy_Visuals enemyVisual { get; private set; }
-
     [Header("Enemy Settings")]
     public Enemy_Melee_Type meleeType;
+    public EnemyMelee_WeaponModel_Type weaponType;
+
     [SerializeField] private Transform shieldTransform;
     public float dodgeCooldown;
 
@@ -72,7 +72,6 @@ public class Enemy_Melee : Enemy
         attackState = new AttackState_Melee(this, stateMachine, "Attack");
         deadState = new DeadState_Melee(this, stateMachine, "Idle"); //idle是占位符 用ragdoll
         abilityState = new AbilityState_Melee(this, stateMachine, "AxeThrow");
-        enemyVisual = GetComponent<Enemy_Visuals>();
     }
 
     protected override void Start()
@@ -103,19 +102,19 @@ public class Enemy_Melee : Enemy
     {
         if (meleeType == Enemy_Melee_Type.AxeThrow)
         {
-            enemyVisual.setWeaponModelType(EnemyMelee_WeaponModel_Type.Throw);
+            weaponType = EnemyMelee_WeaponModel_Type.Throw;
         }
 
         if (meleeType == Enemy_Melee_Type.Shield)
         {
             anim.SetFloat("ChaseIndex", 1);
             shieldTransform.gameObject.SetActive(true);
-            enemyVisual.setWeaponModelType(EnemyMelee_WeaponModel_Type.OneHand);
+            weaponType = EnemyMelee_WeaponModel_Type.OneHand;
         }
 
         if (meleeType == Enemy_Melee_Type.Dodge)
         {
-            enemyVisual.setWeaponModelType(EnemyMelee_WeaponModel_Type.Unarmed);
+            weaponType = EnemyMelee_WeaponModel_Type.Unarmed;
         }
     }
 
