@@ -21,7 +21,7 @@ public class BattleState_Range : EnemyState
         base.Enter();
         bulletsPerAttack = enemy.weaponData.GetBulletsPerAttack();
         weaponCooldown = enemy.weaponData.weaponCooldown;
-        enemy.enemyVisual.EnableIK(true);
+        enemy.enemyVisual.EnableIK(true, true);
     }
 
     public override void Update()
@@ -62,6 +62,6 @@ public class BattleState_Range : EnemyState
     public override void Exit()
     {
         base.Exit();
-        enemy.enemyVisual.EnableIK(false);
+        enemy.enemyVisual.EnableIK(false, false);
     }
 }

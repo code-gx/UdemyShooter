@@ -13,8 +13,8 @@ public class Enemy : MonoBehaviour
     public float aggresionRange;
     [Header("Move data")]
     public float turnSpeed;
-    public float moveSpeed;
-    public float chaseSpeed;
+    public float moveSpeed = 1.5f;
+    public float chaseSpeed = 4.0f;
     private bool manualMovement;
     private bool manualRotation;
     [SerializeField] private Transform[] patrolPoints;

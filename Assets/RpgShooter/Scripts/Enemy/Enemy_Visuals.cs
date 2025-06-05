@@ -32,9 +32,10 @@ public class Enemy_Visuals : MonoBehaviour
     [SerializeField] private SkinnedMeshRenderer skinnedMeshRenderer;
 
     [Header("Rig reference")]
-    [SerializeField] private Transform leftHandIK;
-    [SerializeField] private Transform leftElbowIK;
-    [SerializeField] private Rig rig;
+    [SerializeField] private Transform leftHandIkTarget;
+    [SerializeField] private Transform leftElbowIkTarget;
+    [SerializeField] private TwoBoneIKConstraint leftHandIK;
+    [SerializeField] private MultiAimConstraint gunAimIK;
 
     private void Start()
     {
@@ -156,17 +157,18 @@ public class Enemy_Visuals : MonoBehaviour
         }
     }
 
-    public void EnableIK(bool enable)
+    public void EnableIK(bool enableLeftHandIk, bool enableAim)
     {
-        rig.weight = enable ? 1 : 0;
+        leftHandIK.weight = enableLeftHandIk ? 1 : 0;
+        gunAimIK.weight = enableAim ? 1 : 0;
     }
 
     private void SetupLeftHandIK(Transform leftHand, Transform leftElbow)
     {
-        leftHandIK.localPosition = leftHand.localPosition;
-        leftHandIK.localRotation = leftHand.localRotation;
+        leftHandIkTarget.localPosition = leftHand.localPosition;
+        leftHandIkTarget.localRotation = leftHand.localRotation;
 
-        leftElbowIK.localPosition = leftElbow.localPosition;
-        leftElbowIK.localRotation = leftElbow.localRotation;
+        leftElbowIkTarget.localPosition = leftElbow.localPosition;
+        leftElbowIkTarget.localRotation = leftElbow.localRotation;
     }
 }
