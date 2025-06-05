@@ -5,9 +5,9 @@ using UnityEngine;
 public class Enemy_Range : Enemy
 {
     [Header("Cover system")]
-    public CoverPoint lastCover;
-    public List<Cover> allCovers = new List<Cover>();
     public bool canUseCovers = true;
+    public CoverPoint lastCover { get; private set; }
+    public CoverPoint currentCover { get; private set; }
     [Header("Weapon details")]
     public EnemyRange_WeaponModel_Type weaponType;
     public Enemy_RangeWeaponData weaponData;
@@ -38,7 +38,6 @@ public class Enemy_Range : Enemy
 
         stateMachine.Initialize(idleState);
         SetupWeapon();
-        allCovers.AddRange(CollectNearByCovers());
     }
 
     protected override void Update()
@@ -66,7 +65,7 @@ public class Enemy_Range : Enemy
         if (inBattleMode)
             return;
         base.EnterBattleMode();
-        if (canUseCovers)
+        if (CanGetCover())
             stateMachine.ChangeState(runToCoverState);
         else
             stateMachine.ChangeState(battleState);
@@ -93,11 +92,20 @@ public class Enemy_Range : Enemy
     }
 
     #region Cover system
-
-    public Transform AttemptFindCover()
+    public bool CanGetCover()
+    {
+        if (canUseCovers == false)
+            return false;
+        currentCover = AttemptFindCover()?.GetComponent<CoverPoint>();
+        if (lastCover != currentCover && currentCover != null)
+            return true;
+        Debug.LogWarning("没有找到掩体");
+        return false;
+    }
+    private Transform AttemptFindCover()
     {
         List<CoverPoint> collectedCoverPoints = new List<CoverPoint>();
-        foreach (var cover in allCovers)
+        foreach (var cover in CollectNearByCovers())
         {
             collectedCoverPoints.AddRange(cover.GetValidCoverPoint(transform));
         }
@@ -115,10 +123,13 @@ public class Enemy_Range : Enemy
         if (closetCoverPoint != null)
         {
             lastCover?.SetOccupied(false);
-            lastCover = closetCoverPoint;
-            lastCover.SetOccupied(true);
+            lastCover = currentCover;
+
+            currentCover = closetCoverPoint;
+            currentCover.SetOccupied(true);
+            return currentCover.transform;
         }
-        return lastCover.transform;
+        return null;
     }
 
     private List<Cover> CollectNearByCovers()
@@ -136,4 +147,10 @@ public class Enemy_Range : Enemy
         return coverList;
     }
     #endregion
+
+    protected override void OnDrawGizmos()
+    {
+        base.OnDrawGizmos();
+        Gizmos.DrawLine(transform.position, player.transform.position);
+    }
 }

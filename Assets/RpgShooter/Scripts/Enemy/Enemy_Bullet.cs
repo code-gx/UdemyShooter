@@ -11,9 +11,9 @@ public class Enemy_Bullet : Bullet
         ObjectPool.instance.ReturnToPool(gameObject);
 
         Player player = other.gameObject.GetComponentInParent<Player>();
-        if (player != null)
-        {
-            Debug.Log("Hit player");
-        }
+        // if (player != null)
+        // {
+        //     Debug.Log("Hit player");
+        // }
     }
 }

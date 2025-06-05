@@ -15,11 +15,13 @@ public class RunToCoverState_Range : EnemyState
     public override void Enter()
     {
         base.Enter();
+        destination = enemy.currentCover.transform.position;
+
+        enemy.enemyVisual.EnableIK(true, false);
+
         enemy.agent.isStopped = false;
-        destination = enemy.AttemptFindCover().position;
         enemy.agent.speed = enemy.chaseSpeed;
         enemy.agent.SetDestination(destination);
-        enemy.enemyVisual.EnableIK(true, false);
     }
 
     public override void Update()
