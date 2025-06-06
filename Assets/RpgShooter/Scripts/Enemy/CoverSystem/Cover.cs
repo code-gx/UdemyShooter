@@ -2,6 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum Cover_Perk
+{
+    Unavailiable,
+    CanTakeCover,
+    CanChangeCover,
+}
+
 public class Cover : MonoBehaviour
 {
     private Transform playerTransform;
@@ -93,7 +100,7 @@ public class Cover : MonoBehaviour
 
     private bool IsCoverCloseToLastCover(CoverPoint coverPoint, Transform enemy)
     {
-        CoverPoint lastCover = enemy.GetComponent<Enemy_Range>().lastCover;
+        CoverPoint lastCover = enemy.GetComponent<Enemy_Range>().currentCover;
         if (lastCover == null)
         {
             return false;

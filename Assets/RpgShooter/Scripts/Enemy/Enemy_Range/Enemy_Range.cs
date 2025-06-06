@@ -4,14 +4,26 @@ using UnityEngine;
 
 public class Enemy_Range : Enemy
 {
+    [Header("Enemy perks")]
+    public Cover_Perk coverPerkType;
+    [Header("Advance perk")]
+    public float advanceSpeed;
+    public float advanceStopDistance;
     [Header("Cover system")]
-    public bool canUseCovers = true;
+    public float safeDistance;
     public CoverPoint lastCover { get; private set; }
     public CoverPoint currentCover { get; private set; }
     [Header("Weapon details")]
     public EnemyRange_WeaponModel_Type weaponType;
     public Enemy_RangeWeaponData weaponData;
     [SerializeField] List<Enemy_RangeWeaponData> avaliableWeaponData;
+
+    [Header("Aim details")]
+    public float slowAim = 4;
+    public float fastAim = 20;
+    public Transform aim;
+    public Transform playersBody;
+    public LayerMask whatToIgnore;
 
     [Space]
     public Transform weaponHolder;
@@ -23,6 +35,7 @@ public class Enemy_Range : Enemy
     public MoveState_Range moveState { get; private set; }
     public BattleState_Range battleState { get; private set; }
     public RunToCoverState_Range runToCoverState { get; private set; }
+    public AdavancePlayer_Range advancePlayerState { get; private set; }
     protected override void Awake()
     {
         base.Awake();
@@ -30,11 +43,14 @@ public class Enemy_Range : Enemy
         moveState = new MoveState_Range(this, stateMachine, "Move");
         battleState = new BattleState_Range(this, stateMachine, "Battle");
         runToCoverState = new RunToCoverState_Range(this, stateMachine, "Run");
+        advancePlayerState = new AdavancePlayer_Range(this, stateMachine, "Advance");
     }
 
     protected override void Start()
     {
         base.Start();
+
+        playersBody = player.GetComponent<Player>().playerBody;
 
         stateMachine.Initialize(idleState);
         SetupWeapon();
@@ -94,7 +110,7 @@ public class Enemy_Range : Enemy
     #region Cover system
     public bool CanGetCover()
     {
-        if (canUseCovers == false)
+        if (coverPerkType == Cover_Perk.Unavailiable)
             return false;
         currentCover = AttemptFindCover()?.GetComponent<CoverPoint>();
         if (lastCover != currentCover && currentCover != null)
@@ -148,9 +164,9 @@ public class Enemy_Range : Enemy
     }
     #endregion
 
-    protected override void OnDrawGizmos()
+    public bool AimOnPlayer()
     {
-        base.OnDrawGizmos();
-        Gizmos.DrawLine(transform.position, player.transform.position);
+        float distanceAimToPlayer = Vector3.Distance(aim.position, player.position);
+        return distanceAimToPlayer < 2;
     }
 }

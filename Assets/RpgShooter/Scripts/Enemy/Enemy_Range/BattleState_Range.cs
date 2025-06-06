@@ -10,6 +10,7 @@ public class BattleState_Range : EnemyState
     private int bulletsShot = 0;
     private int bulletsPerAttack;
     private float weaponCooldown;
+    private float coverCheckTimer;
 
     public BattleState_Range(Enemy enemyBase, EnemyStateMachine stateMachine, string animBoolName) : base(enemyBase, stateMachine, animBoolName)
     {
@@ -22,12 +23,19 @@ public class BattleState_Range : EnemyState
         bulletsPerAttack = enemy.weaponData.GetBulletsPerAttack();
         weaponCooldown = enemy.weaponData.weaponCooldown;
         enemy.enemyVisual.EnableIK(true, true);
+
+        enemy.agent.isStopped = true;
+        enemy.agent.velocity = Vector3.zero;
     }
 
     public override void Update()
     {
         base.Update();
-        enemy.FaceTarget(enemy.player.position);
+
+        if (enemy.IsPlayerInAggresionRange() == false)
+            stateMachine.ChangeState(enemy.advancePlayerState);
+
+        ChangeCoverIfShould();
 
         if (WeaponOutOfBullets())
         {
@@ -40,8 +48,32 @@ public class BattleState_Range : EnemyState
         {
             Shoot();
         }
+        enemy.FaceTarget(enemy.player.position);
     }
 
+    private void ChangeCoverIfShould()
+    {
+        if (enemy.coverPerkType != Cover_Perk.CanChangeCover)
+            return;
+        coverCheckTimer -= Time.deltaTime;
+        if (coverCheckTimer < 0)
+        {
+            if (IsPlayerInClearSight() || IsPlayerClose())
+            {
+                if (enemy.CanGetCover())
+                    stateMachine.ChangeState(enemy.runToCoverState);
+            }
+            coverCheckTimer = 0.5f;
+        }
+    }
+
+    public override void Exit()
+    {
+        base.Exit();
+        enemy.enemyVisual.EnableIK(false, false);
+    }
+
+    #region Weapon region
     private void AttemptToResetWeapon()
     {
         bulletsShot = 0;
@@ -58,10 +90,23 @@ public class BattleState_Range : EnemyState
         lastTimeShot = Time.time;
         bulletsShot++;
     }
+    #endregion
 
-    public override void Exit()
+    #region Cover System
+
+    private bool IsPlayerClose()
     {
-        base.Exit();
-        enemy.enemyVisual.EnableIK(false, false);
+        return Vector3.Distance(enemy.transform.position, enemy.player.transform.position) < enemy.safeDistance;
     }
+
+    private bool IsPlayerInClearSight()
+    {
+        Vector3 directionToPlayer = enemy.player.transform.position - enemy.transform.position;
+        if (Physics.Raycast(enemy.transform.position, directionToPlayer, out RaycastHit hitPoint))
+        {
+            return hitPoint.collider.gameObject.GetComponentInParent<Player>();
+        }
+        return false;
+    }
+    #endregion
 }

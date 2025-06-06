@@ -86,8 +86,7 @@ public class Enemy : MonoBehaviour
 
     public bool CanEnterBattleMode()
     {
-        bool inAggresionRange = Vector3.Distance(transform.position, player.position) < aggresionRange;
-        if (inAggresionRange && !inBattleMode)
+        if (IsPlayerInAggresionRange() && !inBattleMode)
         {
             EnterBattleMode();
             return true;
@@ -125,8 +124,9 @@ public class Enemy : MonoBehaviour
     }
     public void ActivateManualMovement(bool manualMovement) => this.manualMovement = manualMovement;
     public void ActivateManualRotation(bool manualRotation) => this.manualRotation = manualRotation;
-    #endregion 
+    #endregion
     
+    public bool IsPlayerInAggresionRange() => Vector3.Distance(transform.position, player.position) < aggresionRange;
     protected virtual void OnDrawGizmos()
     {
         Gizmos.DrawWireSphere(transform.position, aggresionRange);
